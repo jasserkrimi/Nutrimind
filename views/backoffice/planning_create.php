@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result['success']) {
         $_SESSION['success_message'] = "Plan créé avec succès!";
-        header('Location: planning_list.php');
+        header('Location: planning_list.php'); 
         exit;
     } else {
         $errors = $result['errors'];
