@@ -98,7 +98,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
               </li>
             </ul>
           </div>
-        </li>
+        </li> 
         <!-- Dropdown -->
         <li class="ms-3 dropdown">
           <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
