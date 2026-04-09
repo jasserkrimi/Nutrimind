@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<?php session_start(); ?>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -96,6 +97,20 @@
 									<div class="header-icons">
 										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
+										<div class="user-menu-wrapper">
+											<a class="mobile-hide user-icon" href="#"><i class="fas fa-user"></i></a>
+											<?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+												<div class="user-dropdown">
+													<a href="profile.php"><i class="fas fa-cog"></i> Mon Profil</a>
+													<a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+												</div>
+											<?php else: ?>
+												<div class="user-dropdown">
+													<a href="auth.php"><i class="fas fa-sign-in-alt"></i> Connexion</a>
+													<a href="auth.php"><i class="fas fa-user-plus"></i> S'inscrire</a>
+												</div>
+											<?php endif; ?>
+										</div>
 									</div>
 								</li>
 							</ul>
@@ -547,6 +562,236 @@
 	<script src="assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="assets/js/main.js"></script>
+
+	<style>
+		.user-menu-wrapper {
+			position: relative;
+			display: inline-block;
+		}
+
+		.user-icon {
+			cursor: pointer;
+		}
+
+		.user-dropdown {
+			display: none;
+			position: absolute;
+			right: 0;
+			top: 30px;
+			background: white;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			min-width: 180px;
+			box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+			z-index: 1000;
+		}
+
+		.user-dropdown.show {
+			display: block;
+		}
+
+		.user-dropdown a {
+			display: block;
+			padding: 12px 20px;
+			color: #333;
+			text-decoration: none;
+			border-bottom: 1px solid #eee;
+			transition: background-color 0.2s;
+		}
+
+		.user-dropdown a:last-child {
+			border-bottom: none;
+		}
+
+		.user-dropdown a:hover {
+			background-color: #f5f5f5;
+			color: #1161ee;
+		}
+
+		.user-dropdown i {
+			margin-right: 10px;
+			width: 14px;
+		}
+	</style>
+
+	<script>
+		// User menu toggle
+		document.querySelector('.user-icon').addEventListener('click', function(e) {
+			e.preventDefault();
+			const dropdown = this.nextElementSibling;
+			dropdown.classList.toggle('show');
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', function(e) {
+			const wrapper = document.querySelector('.user-menu-wrapper');
+			if (!wrapper.contains(e.target)) {
+				const dropdown = wrapper.querySelector('.user-dropdown');
+				dropdown.classList.remove('show');
+			}
+		});
+
+		// Logout confirmation modal
+		function showLogoutModal() {
+			const modal = document.createElement('div');
+			modal.className = 'logout-modal-overlay';
+			modal.innerHTML = `
+				<div class="logout-modal">
+					<div class="logout-modal-content">
+						<h3>Confirmation de Déconnexion</h3>
+						<p>Êtes-vous sûr de vouloir vous déconnecter?</p>
+						<div class="logout-modal-buttons">
+							<button class="logout-btn-cancel">Annuler</button>
+							<button class="logout-btn-confirm">Déconnexion</button>
+						</div>
+					</div>
+				`;
+			
+			document.body.appendChild(modal);
+			
+			const cancelBtn = modal.querySelector('.logout-btn-cancel');
+			const confirmBtn = modal.querySelector('.logout-btn-confirm');
+			
+			const closeModal = () => modal.remove();
+			
+			cancelBtn.addEventListener('click', closeModal);
+			modal.addEventListener('click', (e) => {
+				if (e.target === modal) closeModal();
+			});
+			
+			confirmBtn.addEventListener('click', () => {
+				fetch('controllers/UserController.php?action=logout')
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							window.location.href = 'index.php';
+						} else {
+							const msg = document.createElement('div');
+							msg.style.cssText = 'position:fixed;top:20px;right:20px;background:#f8d7da;color:#721c24;padding:15px;border-radius:5px;z-index:9999;';
+							msg.textContent = 'Erreur lors de la déconnexion';
+							document.body.appendChild(msg);
+							setTimeout(() => msg.remove(), 3000);
+							closeModal();
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						const msg = document.createElement('div');
+						msg.style.cssText = 'position:fixed;top:20px;right:20px;background:#f8d7da;color:#721c24;padding:15px;border-radius:5px;z-index:9999;';
+						msg.textContent = 'Une erreur s\'est produite';
+						document.body.appendChild(msg);
+						setTimeout(() => msg.remove(), 3000);
+						closeModal();
+					});
+			});
+		}
+		
+		// Logout function
+		function logout() {
+			showLogoutModal();
+		}
+		
+		/* Logout Modal Styles */
+		const logoutModalStyles = `
+			.logout-modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 10000;
+			}
+			
+			.logout-modal {
+				background: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+				animation: slideIn 0.3s ease-out;
+			}
+			
+			.logout-modal-content {
+				padding: 30px;
+				min-width: 400px;
+				text-align: center;
+			}
+			
+			.logout-modal-content h3 {
+				margin: 0 0 15px 0;
+				color: #333;
+				font-size: 22px;
+			}
+			
+			.logout-modal-content p {
+				margin: 0 0 30px 0;
+				color: #666;
+				font-size: 16px;
+			}
+			
+			.logout-modal-buttons {
+				display: flex;
+				gap: 10px;
+				justify-content: center;
+			}
+			
+			.logout-btn-cancel, .logout-btn-confirm {
+				padding: 12px 30px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-weight: 600;
+				font-size: 14px;
+				transition: all 0.3s;
+			}
+			
+			.logout-btn-cancel {
+				background-color: #e0e0e0;
+				color: #333;
+			}
+			
+			.logout-btn-cancel:hover {
+				background-color: #d0d0d0;
+			}
+			
+			.logout-btn-confirm {
+				background-color: #dc3545;
+				color: white;
+			}
+			
+			.logout-btn-confirm:hover {
+				background-color: #c82333;
+			}
+			
+			@keyframes slideIn {
+				from {
+					transform: translateY(-50px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+			
+			@media (max-width: 480px) {
+				.logout-modal-content {
+					min-width: 300px;
+				}
+				
+				.logout-modal-buttons {
+					flex-direction: column;
+				}
+			}
+		`;
+		
+		// Inject modal styles
+		const styleSheet = document.createElement('style');
+		styleSheet.textContent = logoutModalStyles;
+		document.head.appendChild(styleSheet);
+	</script>
 
 </body>
 </html>
