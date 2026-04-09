@@ -142,6 +142,11 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
             class="nav-text">Dashboard</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
             class="nav-text">Users</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
+      <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
+            class="nav-text">Manage Plans</span></a></li>
+      <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
+            class="nav-text">Create Plan</span></a></li>
       <li><a class="nav-link" href="inventory.html"><i class="ti ti-box-seam"></i><span
             class="nav-text">Inventory</span></a></li>
       <li><a class="nav-link" href="create-product.html"><i class="ti ti-plus"></i><span class="nav-text">Add

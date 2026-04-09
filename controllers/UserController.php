@@ -1,8 +1,10 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-require_once '../config/Database.php';
-require_once '../models/User.php';
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../models/User.php';
 
 class UserController {
     private $db;
@@ -214,8 +216,15 @@ class UserController {
     }
 
     /**
-     * Check if user is logged in
+     * Get all users (for admin use)
      */
+    public function getAllUsers() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return [];
+        }
+
+        return $this->user->getAllUsers();
+    }
     public static function isLoggedIn() {
         return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     }
@@ -266,57 +275,59 @@ class UserController {
     }
 }
 
-// Handle requests
-$method = $_POST['action'] ?? $_GET['action'] ?? null;
+if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    // Handle requests
+    $method = $_POST['action'] ?? $_GET['action'] ?? null;
 
-$controller = new UserController();
-$response = ['success' => false, 'message' => 'Invalid action'];
+    $controller = new UserController();
+    $response = ['success' => false, 'message' => 'Invalid action'];
 
-switch ($method) {
-    case 'signup':
-        $response = $controller->signup();
-        break;
+    switch ($method) {
+        case 'signup':
+            $response = $controller->signup();
+            break;
 
-    case 'signin':
-        $response = $controller->signin();
-        break;
+        case 'signin':
+            $response = $controller->signin();
+            break;
 
-    case 'logout':
-        $response = $controller->logout();
-        break;
+        case 'logout':
+            $response = $controller->logout();
+            break;
 
-    case 'update_profile':
-        $response = $controller->updateProfile();
-        break;
+        case 'update_profile':
+            $response = $controller->updateProfile();
+            break;
 
-    case 'change_password':
-        $response = $controller->changePassword();
-        break;
+        case 'change_password':
+            $response = $controller->changePassword();
+            break;
 
-    case 'delete_account':
-        $response = $controller->deleteAccount();
-        break;
+        case 'delete_account':
+            $response = $controller->deleteAccount();
+            break;
 
-    case 'get_profile':
-        $response = ['success' => true, 'data' => $controller->getProfile()];
-        break;
+        case 'get_profile':
+            $response = ['success' => true, 'data' => $controller->getProfile()];
+            break;
 
-    default:
-        // If it's a POST request but no action specified, try to determine from form
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Check for hidden field or form context
-            if (isset($_POST['nom']) && isset($_POST['mot_de_passe']) && !isset($_POST['age'])) {
-                // Likely signup
-                $response = $controller->signup();
-            } elseif (isset($_POST['email']) && isset($_POST['password']) && !isset($_POST['confirm_mot_de_passe'])) {
-                // Likely signin
-                $response = $controller->signin();
+        default:
+            // If it's a POST request but no action specified, try to determine from form
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Check for hidden field or form context
+                if (isset($_POST['nom']) && isset($_POST['mot_de_passe']) && !isset($_POST['age'])) {
+                    // Likely signup
+                    $response = $controller->signup();
+                } elseif (isset($_POST['email']) && isset($_POST['password']) && !isset($_POST['confirm_mot_de_passe'])) {
+                    // Likely signin
+                    $response = $controller->signin();
+                }
             }
-        }
-}
+    }
 
-// Return JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
-exit;
+    // Return JSON response
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
 ?>

@@ -73,7 +73,7 @@
 										<li><a href="about.html">About</a></li>
 										<li><a href="cart.html">Cart</a></li>
 										<li><a href="checkout.html">Check Out</a></li>
-										<li><a href="contact.html">Contact</a></li>
+										<li><a href="objectif_list.php">Planning</a></li>
 										<li><a href="news.html">News</a></li>
 										<li><a href="shop.html">Shop</a></li>
 									</ul>
@@ -84,7 +84,7 @@
 										<li><a href="ingredient_list.php">Ingredients</a></li>
 									</ul>
 								</li>
-								<li><a href="contact.html">Contact</a></li>
+								<li><a href="objectif_list.php">Planning</a></li>
 								<li><a href="shop.html">Shop</a>
 									<ul class="sub-menu">
 										<li><a href="shop.html">Shop</a></li>
@@ -155,7 +155,7 @@
 						<h1>Fruits de Saison Délicieux</h1>
 						<div class="hero-btns">
 							<a href="shop.html" class="boxed-btn">Collection de Fruits</a>
-							<a href="contact.html" class="bordered-btn">Nous Contacter</a>
+							<a href="objectif_list.php" class="bordered-btn">Nous Planninger</a>
 							</div>
 						</div>
 					</div>
@@ -498,7 +498,7 @@
 							<li><a href="about.html">About</a></li>
 							<li><a href="services.html">Shop</a></li>
 							<li><a href="news.html">News</a></li>
-							<li><a href="contact.html">Contact</a></li>
+							<li><a href="objectif_list.php">Planning</a></li>
 						</ul>
 					</div>
 				</div>
@@ -660,7 +660,7 @@
 			});
 			
 			confirmBtn.addEventListener('click', () => {
-				fetch('controllers/UserController.php?action=logout')
+				fetch('../controllers/UserController.php?action=logout')
 					.then(response => response.json())
 					.then(data => {
 						if (data.success) {

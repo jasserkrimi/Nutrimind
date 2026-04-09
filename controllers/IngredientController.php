@@ -1,6 +1,6 @@
 <?php
 
-require_once '../models/Ingredient.php';
+require_once __DIR__ . '/../models/Ingredient.php';
 
 class IngredientController
 {

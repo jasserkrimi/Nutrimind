@@ -93,8 +93,17 @@ class User {
     }
 
     /**
-     * Update user profile
+     * Get all users
      */
+    public function getAllUsers() {
+        $query = "SELECT id, nom, email, role, date_creation, age, poids, taille, allergique 
+                  FROM " . $this->table . " 
+                  ORDER BY nom ASC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function updateProfile() {
         $query = "UPDATE " . $this->table . " 
                   SET nom = :nom, 
