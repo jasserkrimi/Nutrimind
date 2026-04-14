@@ -4,7 +4,7 @@ require_once '../controllers/IngredientController.php';
 
 $ingredientController = new IngredientController();
 $errors = array();
-$ingredientData = null;
+$ingredientData = null; 
 
 // Get ingredient ID from URL
 if (!isset($_GET['id'])) {
