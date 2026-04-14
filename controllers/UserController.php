@@ -274,6 +274,43 @@ class UserController {
             }
         }
     }
+
+    /**
+     * Admin Delete User
+     */
+    public function deleteUser() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Check if user is logged in and is admin
+            if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+                return ['success' => false, 'errors' => ['Unauthorized access']];
+            }
+
+            // Get user ID to delete
+            $userId = $_POST['user_id'] ?? '';
+
+            if (empty($userId) || !is_numeric($userId)) {
+                return ['success' => false, 'errors' => ['Invalid user ID']];
+            }
+
+            // Prevent admin from deleting themselves
+            if ((int)$userId === (int)$_SESSION['user_id']) {
+                return ['success' => false, 'errors' => ['Vous ne pouvez pas supprimer votre propre compte']];
+            }
+
+            // Check if user exists
+            $userToDelete = $this->user->getUserById($userId);
+            if (!$userToDelete) {
+                return ['success' => false, 'errors' => ['Utilisateur non trouvé']];
+            }
+
+            // Delete user
+            if ($this->user->deleteAccount($userId)) {
+                return ['success' => true, 'message' => 'Utilisateur supprimé avec succès'];
+            } else {
+                return ['success' => false, 'errors' => ['Erreur lors de la suppression de l\'utilisateur']];
+            }
+        }
+    }
 }
 
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
@@ -306,6 +343,10 @@ if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
 
         case 'delete_account':
             $response = $controller->deleteAccount();
+            break;
+
+        case 'delete_user':
+            $response = $controller->deleteUser();
             break;
 
         case 'get_profile':

@@ -171,6 +171,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                       <th>Courrier Électronique</th>
                       <th>Rôle</th>
                       <th>Date d'Inscription</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -196,11 +197,16 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                           <td>
                             <small class="text-muted"><?php echo date('M d, Y', strtotime($user['date_creation'])); ?></small>
                           </td>
+                          <td>
+                            <button class="btn btn-sm btn-danger" onclick="showDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['nom']); ?>')">
+                              <i class="ti ti-trash"></i> Supprimer
+                            </button>
+                          </td>
                         </tr>
                       <?php endforeach; ?>
                     <?php else: ?>
                       <tr>
-                        <td colspan="4" class="text-center py-4">
+                        <td colspan="5" class="text-center py-4">
                           <p class="text-muted mb-0">Aucun utilisateur trouvé</p>
                         </td>
                       </tr>
@@ -316,6 +322,66 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     function logout() {
         showLogoutModal();
+    }
+
+    // Delete user functions
+    function showDeleteModal(userId, userName) {
+        const modal = document.createElement('div');
+        modal.className = 'delete-modal-overlay';
+        modal.innerHTML = `
+            <div class="delete-modal">
+                <div class="delete-modal-content">
+                    <h3>Confirmation de Suppression</h3>
+                    <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>${userName}</strong> ?</p>
+                    <p class="text-danger small">Cette action est irréversible.</p>
+                    <div class="delete-modal-buttons">
+                        <button class="delete-btn-cancel">Annuler</button>
+                        <button class="delete-btn-confirm" data-user-id="${userId}">Supprimer</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const cancelBtn = modal.querySelector('.delete-btn-cancel');
+        const confirmBtn = modal.querySelector('.delete-btn-confirm');
+        
+        const closeModal = () => modal.remove();
+        
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        
+        confirmBtn.addEventListener('click', () => {
+            const id = confirmBtn.getAttribute('data-user-id');
+            deleteUser(id);
+            closeModal();
+        });
+    }
+
+    function deleteUser(userId) {
+        fetch('../../controllers/UserController.php?action=delete_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `user_id=${userId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to refresh the user list
+                location.reload();
+            } else {
+                alert('Erreur: ' + (data.errors ? data.errors.join(', ') : 'Une erreur est survenue'));
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            alert('Une erreur est survenue lors de la suppression');
+        });
     }
 
     // Initialize dropdown toggle
@@ -434,6 +500,95 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     .dropdown {
         position: relative;
+    }
+  </style>
+
+  <style>
+    .delete-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    
+    .delete-modal {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .delete-modal-content {
+        padding: 30px;
+        min-width: 400px;
+        text-align: center;
+    }
+    
+    .delete-modal-content h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 22px;
+    }
+    
+    .delete-modal-content p {
+        margin: 0 0 10px 0;
+        color: #666;
+        font-size: 16px;
+    }
+    
+    .delete-modal-content p.text-danger {
+        margin-bottom: 30px;
+    }
+    
+    .delete-modal-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .delete-btn-cancel, .delete-btn-confirm {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .delete-btn-cancel {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+    
+    .delete-btn-cancel:hover {
+        background-color: #d0d0d0;
+    }
+    
+    .delete-btn-confirm {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .delete-btn-confirm:hover {
+        background-color: #c82333;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
   </style>
 
