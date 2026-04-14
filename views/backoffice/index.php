@@ -9,6 +9,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
     exit;
 }
 
+<<<<<<< HEAD
 // Include controllers
 require_once '../../controllers/MealController.php';
 require_once '../../controllers/IngredientController.php';
@@ -41,6 +42,23 @@ if (isset($_GET['delete_ingredient'])) {
         exit;
     } else {
         $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrédient!";
+=======
+// Check for new objectives
+$newObjectives = [];
+if (isset($_SESSION['user_id'])) {
+    require_once __DIR__ . '/../../controllers/UserController.php';
+    require_once __DIR__ . '/../../models/Objectif.php';
+
+    $userController = new UserController();
+    if (empty($_SESSION['last_login'])) {
+        $profile = $userController->getProfile();
+        $_SESSION['last_login'] = $profile['last_login'] ?? null;
+    }
+
+    if (!empty($_SESSION['last_login'])) {
+        $objectifModel = new Objectif();
+        $newObjectives = $objectifModel->getAddedAfter($_SESSION['last_login']);
+>>>>>>> planning
     }
 }
 ?>
@@ -91,13 +109,28 @@ if (isset($_GET['delete_ingredient'])) {
               <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
               <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
             </svg>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2">
-              2
-              <span class="visually-hidden">unread messages</span>
-            </span>
+            <?php if (!empty($newObjectives)): ?>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2">
+                <?php echo count($newObjectives); ?>
+                <span class="visually-hidden">new objectives</span>
+              </span>
+            <?php endif; ?>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0">
             <ul class="list-unstyled p-0 m-0">
+              <?php if (!empty($newObjectives)): ?>
+                <li class="p-3 border-bottom ">
+                  <div class="d-flex gap-3">
+                    <div class="avatar avatar-sm rounded-circle bg-success text-white d-flex align-items-center justify-content-center">
+                      <span><?php echo count($newObjectives); ?></span>
+                    </div>
+                    <div class="flex-grow-1 small">
+                      <p class="mb-0 fw-bold"><?php echo count($newObjectives); ?> new objective<?php echo count($newObjectives) > 1 ? 's' : ''; ?></p>
+                      <p class="mb-1">Added since your last login.</p>
+                    </div>
+                  </div>
+                </li>
+              <?php endif; ?>
               <li class="p-3 border-bottom ">
                 <div class="d-flex gap-3">
                   <img src="assets/images/avatar-1.jpg" alt="" class="avatar avatar-sm rounded-circle" />
@@ -116,8 +149,8 @@ if (isset($_GET['delete_ingredient'])) {
                     <p class="mb-1">User @john_doe has signed up</p>
                     <div class="text-secondary">30 minutes ago</div>
                   </div>
+                </div>
               </li>
-
               <li class="p-3 border-bottom">
                 <div class="d-flex gap-3">
                   <img src="assets/images/avatar-2.jpg" alt="" class="avatar avatar-sm rounded-circle" />
@@ -129,7 +162,7 @@ if (isset($_GET['delete_ingredient'])) {
                 </div>
               </li>
               <li class="px-4 py-3 text-center">
-                <a href="#" class="text-success ">View all notifications</a>
+                <a href="objectives.php" class="text-success">View all objectives</a>
               </li>
             </ul>
           </div>
@@ -187,6 +220,8 @@ if (isset($_GET['delete_ingredient'])) {
             class="nav-text">Manage Plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
             class="nav-text">Create Plan</span></a></li>
+      <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
+            class="nav-text">Objectives</span></a></li>
       <li><a class="nav-link" href="inventory.html"><i class="ti ti-box-seam"></i><span
             class="nav-text">Inventory</span></a></li>
       <li><a class="nav-link" href="create-product.html"><i class="ti ti-plus"></i><span class="nav-text">Add
@@ -1015,6 +1050,67 @@ if (isset($_GET['delete_ingredient'])) {
         position: relative;
     }
   </style>
+
+  <!-- New Objectives Modal -->
+  <div class="modal fade" id="newObjectivesModal" tabindex="-1" aria-labelledby="newObjectivesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newObjectivesModalLabel">New Objectives Added</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>The following objectives have been added since your last login:</p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Type</th>
+                  <th>Target Value</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php if (!empty($newObjectives)): ?>
+                  <?php foreach ($newObjectives as $obj): ?>
+                    <tr>
+                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Unknown'); ?></td>
+                      <td><?php echo htmlspecialchars($obj['type_objectif']); ?></td>
+                      <td><?php echo htmlspecialchars($obj['valeur_cible']); ?></td>
+                      <td><?php echo htmlspecialchars($obj['date_limite']); ?></td>
+                      <td><?php echo htmlspecialchars($obj['statut']); ?></td>
+                      <td><?php echo htmlspecialchars($obj['date_creation']); ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="6" class="text-center">No new objectives.</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <a href="objectives.php" class="btn btn-primary">View All Objectives</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    <?php if (!empty($newObjectives)): ?>
+      // Show modal on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
+        modal.show();
+      });
+    <?php endif; ?>
+  </script>
 
 </body>
 

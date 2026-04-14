@@ -88,6 +88,7 @@ class UserController {
                 $_SESSION['user_nom'] = $userData['nom'];
                 $_SESSION['user_email'] = $userData['email'];
                 $_SESSION['user_role'] = $userData['role'];
+                $_SESSION['last_login'] = $userData['last_login'];
                 $_SESSION['logged_in'] = true;
 
                 return ['success' => true, 'message' => 'Login successful! Redirecting...', 'role' => $userData['role']];

@@ -90,6 +90,22 @@ class Objectif {
     }
 
     /**
+     * Get objectives added after a specific date
+     */
+    public function getAddedAfter($date) {
+        $query = "SELECT o.*, u.nom as user_nom, u.email as user_email 
+                  FROM " . $this->table . " o 
+                  LEFT JOIN user u ON o.user_id = u.id 
+                  WHERE o.date_creation >= :date 
+                  ORDER BY o.date_creation DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':date', $date);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Update objectif
      */
     public function update() {
