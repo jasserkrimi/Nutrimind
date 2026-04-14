@@ -72,7 +72,6 @@ if (isset($_GET['delete'])) {
 						<table class="table table-striped table-hover">
 							<thead class="table-dark">
 								<tr>
-									<th>ID</th>
 									<th>Nom</th>
 									<th>Date</th>
 									<th>Notes</th>
@@ -82,12 +81,11 @@ if (isset($_GET['delete'])) {
 							<tbody>
 								<?php if (empty($meals)): ?>
 									<tr>
-										<td colspan="5" class="text-center"><em>Aucun repas trouvé</em></td>
+										<td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td>
 									</tr>
 								<?php else: ?>
 									<?php foreach ($meals as $meal): ?>
 										<tr>
-											<td><?php echo htmlspecialchars($meal['id']); ?></td>
 											<td><?php echo htmlspecialchars($meal['name']); ?></td>
 											<td><?php echo htmlspecialchars($meal['date']); ?></td>
 											<td><?php echo htmlspecialchars(substr($meal['notes'], 0, 50)) . (strlen($meal['notes']) > 50 ? '...' : ''); ?></td>

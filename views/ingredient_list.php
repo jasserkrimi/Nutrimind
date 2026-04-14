@@ -72,7 +72,6 @@ if (isset($_GET['delete'])) {
 						<table class="table table-striped table-hover">
 							<thead class="table-dark">
 								<tr>
-									<th>ID</th>
 									<th>Nom</th>
 									<th>Cal (kcal)</th>
 									<th>Prot (g)</th>
@@ -84,12 +83,11 @@ if (isset($_GET['delete'])) {
 							<tbody>
 								<?php if (empty($ingredients)): ?>
 									<tr>
-										<td colspan="7" class="text-center"><em>Aucun ingrédient trouvé</em></td>
+										<td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td>
 									</tr>
 								<?php else: ?>
 									<?php foreach ($ingredients as $ing): ?>
 										<tr>
-											<td><?php echo htmlspecialchars($ing['id']); ?></td>
 											<td><?php echo htmlspecialchars($ing['name']); ?></td>
 											<td><?php echo htmlspecialchars($ing['calories']); ?></td>
 											<td><?php echo htmlspecialchars($ing['proteins']); ?></td>

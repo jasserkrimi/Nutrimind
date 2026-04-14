@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../models/Meal.php';
-require_once __DIR__ . '/../models/MealIngredient.php';
+require_once '../models/Meal.php';
+require_once '../models/MealIngredient.php';
 
 class MealController
 {
