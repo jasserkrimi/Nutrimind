@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/MealIngredient.php';
 
 class Ingredient
 {
@@ -101,6 +102,17 @@ class Ingredient
     // Delete ingredient
     public function delete()
     {
+        // First, delete all meal-ingredient relationships for this ingredient
+        $mealIngredient = new MealIngredient();
+        $mealIngredient->ingredient_id = $this->id;
+        
+        // We need to delete all records where this ingredient is used
+        $query_relationships = "DELETE FROM Meal_Ingredient WHERE ingredient_id = :ingredient_id";
+        $stmt_relationships = $this->conn->prepare($query_relationships);
+        $stmt_relationships->bindParam(':ingredient_id', $this->id);
+        $stmt_relationships->execute();
+
+        // Then delete the ingredient
         $query = "DELETE FROM " . $this->table . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $this->id = htmlspecialchars(strip_tags($this->id));

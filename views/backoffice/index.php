@@ -8,6 +8,41 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
     header('Location: ../index.php');
     exit;
 }
+
+// Include controllers
+require_once '../../controllers/MealController.php';
+require_once '../../controllers/IngredientController.php';
+
+// Initialize controllers
+$mealController = new MealController();
+$ingredientController = new IngredientController();
+
+// Get data
+$meals = $mealController->getAll();
+$ingredients = $ingredientController->getAll();
+
+// Handle delete operations
+if (isset($_GET['delete_meal'])) {
+    $deleteId = htmlspecialchars($_GET['delete_meal']);
+    if ($mealController->delete($deleteId)) {
+        $_SESSION['success_message'] = "Repas supprimé avec succès!";
+        header('Location: index.php');
+        exit;
+    } else {
+        $_SESSION['error_message'] = "Erreur lors de la suppression du repas!";
+    }
+}
+
+if (isset($_GET['delete_ingredient'])) {
+    $deleteId = htmlspecialchars($_GET['delete_ingredient']);
+    if ($ingredientController->delete($deleteId)) {
+        $_SESSION['success_message'] = "Ingrédient supprimé avec succès!";
+        header('Location: index.php');
+        exit;
+    } else {
+        $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrédient!";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -142,6 +177,11 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
             class="nav-text">Dashboard</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
             class="nav-text">Users</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
+      <li><a class="nav-link" href="#meals-section" onclick="scrollToSection('meals-section')"><i class="ti ti-utensils"></i><span
+            class="nav-text">Meals</span></a></li>
+      <li><a class="nav-link" href="#ingredients-section" onclick="scrollToSection('ingredients-section')"><i class="ti ti-leaf"></i><span
+            class="nav-text">Ingredients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
             class="nav-text">Manage Plans</span></a></li>
@@ -639,6 +679,116 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
         </div>
 
       </div>
+      
+      <!-- Meals Section -->
+      <div id="meals-section" class="row g-3 mb-3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
+              <h4 class="mb-0 h5"><i class="ti ti-utensils me-2"></i>Gestion des Repas</h4>
+            </div>
+            <div class="card-body p-4">
+              <!-- Success/Error Messages -->
+              <?php if (isset($_SESSION['success_message'])): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              <?php endif; ?>
+
+              <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              <?php endif; ?>
+
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Nom</th>
+                      <th>Date</th>
+                      <th>Notes</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php if (empty($meals)): ?>
+                      <tr>
+                        <td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td>
+                      </tr>
+                    <?php else: ?>
+                      <?php foreach ($meals as $meal): ?>
+                        <tr>
+                          <td><?php echo htmlspecialchars($meal['name']); ?></td>
+                          <td><?php echo htmlspecialchars($meal['date']); ?></td>
+                          <td><?php echo htmlspecialchars(substr($meal['notes'], 0, 50)) . (strlen($meal['notes']) > 50 ? '...' : ''); ?></td>
+                          <td>
+                            <a href="#" class="btn btn-sm btn-danger delete-meal" data-id="<?php echo htmlspecialchars($meal['id']); ?>"><i class="ti ti-trash"></i> Supprimer</a>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      <div id="ingredients-section" class="row g-3 mb-3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
+              <h4 class="mb-0 h5"><i class="ti ti-leaf me-2"></i>Gestion des Ingrédients</h4>
+            </div>
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Nom</th>
+                      <th>Cal (kcal)</th>
+                      <th>Prot (g)</th>
+                      <th>Glucides (g)</th>
+                      <th>Lipides (g)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php if (empty($ingredients)): ?>
+                      <tr>
+                        <td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td>
+                      </tr>
+                    <?php else: ?>
+                      <?php foreach ($ingredients as $ing): ?>
+                        <tr>
+                          <td><?php echo htmlspecialchars($ing['name']); ?></td>
+                          <td><?php echo htmlspecialchars($ing['calories']); ?></td>
+                          <td><?php echo htmlspecialchars($ing['proteins']); ?></td>
+                          <td><?php echo htmlspecialchars($ing['glucides']); ?></td>
+                          <td><?php echo htmlspecialchars($ing['lipides']); ?></td>
+                          <td>
+                            <a href="#" class="btn btn-sm btn-danger delete-ingredient" data-id="<?php echo htmlspecialchars($ing['id']); ?>"><i class="ti ti-trash"></i> Supprimer</a>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-12">
 <footer class="text-center py-2 mt-6 text-secondary ">
@@ -729,6 +879,36 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
                 }
             });
         });
+
+        // Delete meal functionality
+        document.querySelectorAll('.delete-meal').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mealId = this.getAttribute('data-id');
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+                    window.location.href = `index.php?delete_meal=${mealId}`;
+                }
+            });
+        });
+
+        // Delete ingredient functionality
+        document.querySelectorAll('.delete-ingredient').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const ingredientId = this.getAttribute('data-id');
+                if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+                    window.location.href = `index.php?delete_ingredient=${ingredientId}`;
+                }
+            });
+        });
+
+        // Smooth scrolling function
+        window.scrollToSection = function(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        };
     });
   </script>
 

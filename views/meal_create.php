@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../controllers/MealController.php';
-require_once '../models/Ingredient.php';
+require_once __DIR__ . '/../models/Ingredient.php';
 
 $mealController = new MealController();
 $ingredientModel = new Ingredient();

@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/MealIngredient.php';
 
 class Meal
 {
@@ -90,6 +91,12 @@ class Meal
     // Delete meal
     public function delete()
     {
+        // First, delete all meal-ingredient relationships
+        $mealIngredient = new MealIngredient();
+        $mealIngredient->meal_id = $this->id;
+        $mealIngredient->removeAllIngredientsFromMeal();
+
+        // Then delete the meal
         $query = "DELETE FROM " . $this->table . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $this->id = htmlspecialchars(strip_tags($this->id));
