@@ -96,7 +96,7 @@ if (isset($_GET['delete_meal'])) {
 
         $_SESSION['error_message'] = "Erreur lors de la suppression du repas!";
 
-    }
+    } 
 
 }
  
