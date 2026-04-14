@@ -10,7 +10,7 @@ class Database
 
     public function connect()
     {
-        $this->conn = null;
+        $this->conn = null; 
 
         try {
             $this->conn = new PDO(
