@@ -10,6 +10,7 @@ class User {
     public $mot_de_passe;
     public $role;
     public $date_creation;
+    public $last_login;
     public $age;
     public $poids;
     public $taille;
@@ -51,7 +52,7 @@ class User {
      * Login user - returns user data if credentials valid
      */
     public function login() {
-        $query = "SELECT id, nom, email, mot_de_passe, role, age, poids, taille, allergique 
+        $query = "SELECT id, nom, email, mot_de_passe, role, age, poids, taille, allergique, last_login 
                   FROM " . $this->table . " 
                   WHERE email = :email";
 
@@ -62,6 +63,12 @@ class User {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result && password_verify($this->mot_de_passe, $result['mot_de_passe'])) {
+            // Update last_login
+            $updateQuery = "UPDATE " . $this->table . " SET last_login = NOW() WHERE id = :id";
+            $updateStmt = $this->db->prepare($updateQuery);
+            $updateStmt->bindParam(':id', $result['id']);
+            $updateStmt->execute();
+            
             return $result;
         }
 
