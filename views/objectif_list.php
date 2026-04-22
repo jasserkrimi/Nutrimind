@@ -74,11 +74,19 @@ if (isset($_GET['delete'])) {
 				</div>
 			</div>
 
+			<!-- Objectives Search -->
+			<div class="row mb-4">
+				<div class="col-lg-12">
+					<input type="text" id="objectivesSearchInput" placeholder="Rechercher dans vos objectifs..." 
+					       class="form-control" style="max-width: 500px;">
+				</div>
+			</div>
+
 			<!-- Objectives Table -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" id="objectivesTable">
 							<thead class="table-dark">
 								<tr>
 									<th>ID</th>
@@ -91,7 +99,7 @@ if (isset($_GET['delete'])) {
 									<th>Actions</th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="objectivesTableBody">
 								<?php if (empty($objectives)): ?>
 									<tr>
 										<td colspan="8" class="text-center"><em>Aucun objectif trouvé</em></td>
@@ -156,11 +164,19 @@ if (isset($_GET['delete'])) {
 				</div>
 			</div>
 
+			<!-- Plans Search -->
+			<div class="row mb-4">
+				<div class="col-lg-12">
+					<input type="text" id="plansSearchInput" placeholder="Rechercher dans vos plans nutritionnels..." 
+					       class="form-control" style="max-width: 500px;">
+				</div>
+			</div>
+
 			<!-- Plans Table -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" id="plansTable">
 							<thead class="table-dark">
 								<tr>
 									<th>ID</th>
@@ -177,7 +193,7 @@ if (isset($_GET['delete'])) {
 									<th>Statut</th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="plansTableBody">
 								<?php if (empty($plans)): ?>
 									<tr>
 										<td colspan="12" class="text-center"><em>Aucun plan assigné pour le moment</em></td>
@@ -219,6 +235,27 @@ if (isset($_GET['delete'])) {
 		</div>
 	</div>
 
+	<!-- Statistics Section -->
+	<div class="product-section mt-150 mb-150">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="section-title">
+						<h3><span class="orange-text">Statistiques</span> des Objectifs</h3>
+						<p>Vue d'ensemble de vos objectifs par statut</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Pie Chart -->
+			<div class="row">
+				<div class="col-lg-6 offset-lg-3">
+					<canvas id="objectiveStatsPie" style="max-width: 500px; margin: 0 auto;"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Delete Confirmation Modal -->
 	<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -240,6 +277,9 @@ if (isset($_GET['delete'])) {
 		</div>
 	</div>
 
+	<!-- Chart.js Library -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
 	<script>
 		// Delete confirmation
 		document.querySelectorAll('.delete-objective').forEach(button => {
@@ -250,6 +290,113 @@ if (isset($_GET['delete'])) {
 				$('#deleteModal').modal('show');
 			});
 		});
+
+		// Dynamic search for objectives table
+		document.getElementById('objectivesSearchInput').addEventListener('keyup', function() {
+			const searchValue = this.value.toLowerCase();
+			const tableRows = document.querySelectorAll('#objectivesTableBody tr');
+
+			tableRows.forEach(row => {
+				const rowText = row.textContent.toLowerCase();
+				if (rowText.includes(searchValue)) {
+					row.style.display = '';
+				} else {
+					row.style.display = 'none';
+				}
+			});
+		});
+
+		// Dynamic search for plans table
+		document.getElementById('plansSearchInput').addEventListener('keyup', function() {
+			const searchValue = this.value.toLowerCase();
+			const tableRows = document.querySelectorAll('#plansTableBody tr');
+
+			tableRows.forEach(row => {
+				const rowText = row.textContent.toLowerCase();
+				if (rowText.includes(searchValue)) {
+					row.style.display = '';
+				} else {
+					row.style.display = 'none';
+				}
+			});
+		});
+
+		// Initialize Pie Chart for Objectives Statistics
+		function initializePieChart() {
+			const objectives = <?php echo json_encode($objectives); ?>;
+			const statuts = {};
+
+			// Count objectives by status
+			objectives.forEach(obj => {
+				const statut = obj.statut || 'Inconnu';
+				statuts[statut] = (statuts[statut] || 0) + 1;
+			});
+
+			// Vibrant colors for each status
+			const colorMap = {
+				'en_attente': '#f59e0b',
+				'en_cours':   '#6366f1',
+				'termine':    '#10b981',
+				'annule':     '#ef4444',
+				'active':     '#10b981',
+				'inactive':   '#ef4444',
+				'pending':    '#f59e0b'
+			};
+
+			const labels = Object.keys(statuts);
+			const data = Object.values(statuts);
+			const colors = labels.map(label => colorMap[label] || '#94a3b8');
+
+			const ctx = document.getElementById('objectiveStatsPie').getContext('2d');
+			
+			if (window.pieChart) {
+				window.pieChart.destroy();
+			}
+
+			window.pieChart = new Chart(ctx, {
+				type: 'doughnut',
+				data: {
+					labels: labels.map(l => l.replace('_', ' ').toUpperCase()),
+					datasets: [{
+						data: data,
+						backgroundColor: colors,
+						borderColor: '#fff',
+						borderWidth: 3,
+						hoverOffset: 10
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: true,
+					cutout: '60%',
+					plugins: {
+						legend: {
+							position: 'bottom',
+							labels: {
+								padding: 20,
+								font: { size: 14 },
+								usePointStyle: true,
+								pointStyleWidth: 10
+							}
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									return context.label + ': ' + context.parsed + ' objectif(s)';
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+
+		// Initialize the chart when page loads
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initializePieChart);
+		} else {
+			initializePieChart();
+		}
 	</script>
 
 <?php include 'footer.php'; ?>

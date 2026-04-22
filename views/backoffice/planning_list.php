@@ -68,28 +68,20 @@ if (isset($_GET['delete'])) {
      <a href="index.php" class="d-inline-flex"><img src="assets/images/logooo.png" alt="Nutrimind" style="max-height: 50px; width: auto;"></a>
     </div>
     <ul class="nav flex-column">
-      <li class="px-4 py-2"><small class="nav-text">Main</small></li>
+      <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
       <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span
-            class="nav-text">Dashboard</span></a></li>
+            class="nav-text">Tableau de bord</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
-            class="nav-text">Users</span></a></li>
+            class="nav-text">Utilisateurs</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link active" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Manage Plans</span></a></li>
+            class="nav-text">Gérer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Create Plan</span></a></li>
-      <li><a class="nav-link" href="inventory.html"><i class="ti ti-box-seam"></i><span
-            class="nav-text">Inventory</span></a></li>
-      <li><a class="nav-link" href="create-product.html"><i class="ti ti-plus"></i><span class="nav-text">Add
-            Product</span></a></li>
-    <li><a class="nav-link" href="reports.html"><i class="ti ti-receipt"></i><span class="nav-text">Reports</span></a>
-      </li>
-    <li><a class="nav-link" href="404-error.html"><i class="ti ti-alert-circle"></i><span class="nav-text">404 Error</span></a>
-      </li>
-      <li><a class="nav-link" href="docs.html"><i class="ti ti-file-text"></i><span class="nav-text">Docs</span></a></li>
+            class="nav-text">Créer un plan</span></a></li>
+      <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
+            class="nav-text">Objectifs</span></a></li>
 
-
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
+      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
       </li>
     </ul>
@@ -139,13 +131,21 @@ if (isset($_GET['delete'])) {
         </div>
       <?php endif; ?>
 
+      <!-- Search Bar -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <input type="text" id="planningSearchInput" placeholder="Rechercher dans les plans..." 
+                 class="form-control" style="max-width: 500px;">
+        </div>
+      </div>
+
       <!-- Plans Table -->
       <div class="row">
         <div class="col-12">
           <div class="card">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="planningTable">
                   <thead class="table-dark">
                     <tr>
                       <th>ID</th>
@@ -159,7 +159,7 @@ if (isset($_GET['delete'])) {
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="planningTableBody">
                     <?php if (empty($plannings)): ?>
                       <tr>
                         <td colspan="9" class="text-center">Aucun plan trouvé</td>
@@ -229,6 +229,41 @@ if (isset($_GET['delete'])) {
   </div>
 
   <script>
+    // Dynamic search/filter
+    document.getElementById('planningSearchInput').addEventListener('input', function () {
+      const query = this.value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#planningTableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        // Skip the "no results" placeholder row
+        if (row.cells.length === 1) return;
+
+        const text = Array.from(row.cells)
+          .slice(0, 8) // exclude Actions column
+          .map(cell => cell.textContent.toLowerCase())
+          .join(' ');
+
+        const match = text.includes(query);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      // Show "no results" message if nothing matches
+      let noResultRow = document.getElementById('noResultRow');
+      if (visibleCount === 0 && query !== '') {
+        if (!noResultRow) {
+          noResultRow = document.createElement('tr');
+          noResultRow.id = 'noResultRow';
+          noResultRow.innerHTML = '<td colspan="9" class="text-center text-muted">Aucun résultat trouvé</td>';
+          document.getElementById('planningTableBody').appendChild(noResultRow);
+        }
+        noResultRow.style.display = '';
+      } else if (noResultRow) {
+        noResultRow.style.display = 'none';
+      }
+    });
+
     // Delete confirmation
     document.querySelectorAll('.delete-planning').forEach(button => {
       button.addEventListener('click', function(e) {

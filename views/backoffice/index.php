@@ -415,6 +415,7 @@ if (isset($_GET['delete_ingredient'])) {
     </div>
 
     <ul class="nav flex-column">
+<<<<<<< HEAD
 
       <li class="px-4 py-2"><small class="nav-text">Main</small></li>
 
@@ -436,9 +437,17 @@ if (isset($_GET['delete_ingredient'])) {
 
             class="nav-text">Ingredients</span></a></li>
 
+=======
+      <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
+      <li><a class="nav-link active" href="index.php"><i class="ti ti-home"></i><span
+            class="nav-text">Tableau de bord</span></a></li>
+      <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
+            class="nav-text">Utilisateurs</span></a></li>
+>>>>>>> planning
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
 
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
+<<<<<<< HEAD
 
             class="nav-text">Manage Plans</span></a></li>
 
@@ -474,6 +483,15 @@ if (isset($_GET['delete_ingredient'])) {
 
       <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
 
+=======
+            class="nav-text">Gérer les plans</span></a></li>
+      <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
+            class="nav-text">Créer un plan</span></a></li>
+      <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
+            class="nav-text">Objectifs</span></a></li>
+
+      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+>>>>>>> planning
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
 
       </li>
@@ -510,6 +528,21 @@ if (isset($_GET['delete_ingredient'])) {
 
       <div class="row g-3 mb-3">
 
+        <div class="col-lg-3 col-12">
+          <a href="objectives.php" class="text-decoration-none">
+            <div class="card p-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-2 h-100" style="cursor:pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(13,110,253,0.15)'" onmouseout="this.style.boxShadow=''">
+              <div class="d-flex gap-3 align-items-center">
+                <div class="icon-shape icon-md bg-primary text-white rounded-2">
+                  <i class="ti ti-target fs-4"></i>
+                </div>
+                <div>
+                  <h2 class="mb-1 fs-6 text-body">Objectifs</h2>
+                  <p class="text-primary mb-0 small fw-semibold">Gérer les objectifs →</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
         <div class="col-lg-3 col-12">
 
 
@@ -2106,10 +2139,14 @@ if (isset($_GET['delete_ingredient'])) {
 
   </style>
 
+<<<<<<< HEAD
 
 
   <!-- New Objectives Modal -->
 
+=======
+  <!-- Modal Nouveaux Objectifs -->
+>>>>>>> planning
   <div class="modal fade" id="newObjectivesModal" tabindex="-1" aria-labelledby="newObjectivesModalLabel" aria-hidden="true">
 
     <div class="modal-dialog modal-lg">
@@ -2117,17 +2154,26 @@ if (isset($_GET['delete_ingredient'])) {
       <div class="modal-content">
 
         <div class="modal-header">
+<<<<<<< HEAD
 
           <h5 class="modal-title" id="newObjectivesModalLabel">New Objectives Added</h5>
 
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
+=======
+          <h5 class="modal-title" id="newObjectivesModalLabel">Nouveaux objectifs ajoutés</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+>>>>>>> planning
         </div>
 
         <div class="modal-body">
+<<<<<<< HEAD
 
           <p>The following objectives have been added since your last login:</p>
 
+=======
+          <p>Les objectifs suivants ont été ajoutés depuis votre dernière connexion :</p>
+>>>>>>> planning
           <div class="table-responsive">
 
             <table class="table table-striped">
@@ -2135,6 +2181,7 @@ if (isset($_GET['delete_ingredient'])) {
               <thead>
 
                 <tr>
+<<<<<<< HEAD
 
                   <th>User</th>
 
@@ -2148,6 +2195,14 @@ if (isset($_GET['delete_ingredient'])) {
 
                   <th>Created</th>
 
+=======
+                  <th>Utilisateur</th>
+                  <th>Type</th>
+                  <th>Valeur cible</th>
+                  <th>Date limite</th>
+                  <th>Statut</th>
+                  <th>Créé le</th>
+>>>>>>> planning
                 </tr>
 
               </thead>
@@ -2159,9 +2214,13 @@ if (isset($_GET['delete_ingredient'])) {
                   <?php foreach ($newObjectives as $obj): ?>
 
                     <tr>
+<<<<<<< HEAD
 
                       <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Unknown'); ?></td>
 
+=======
+                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Inconnu'); ?></td>
+>>>>>>> planning
                       <td><?php echo htmlspecialchars($obj['type_objectif']); ?></td>
 
                       <td><?php echo htmlspecialchars($obj['valeur_cible']); ?></td>
@@ -2179,9 +2238,13 @@ if (isset($_GET['delete_ingredient'])) {
                 <?php else: ?>
 
                   <tr>
+<<<<<<< HEAD
 
                     <td colspan="6" class="text-center">No new objectives.</td>
 
+=======
+                    <td colspan="6" class="text-center">Aucun nouvel objectif.</td>
+>>>>>>> planning
                   </tr>
 
                 <?php endif; ?>
@@ -2195,11 +2258,16 @@ if (isset($_GET['delete_ingredient'])) {
         </div>
 
         <div class="modal-footer">
+<<<<<<< HEAD
 
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
           <a href="objectives.php" class="btn btn-primary">View All Objectives</a>
 
+=======
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="objectives.php" class="btn btn-primary">Voir tous les objectifs</a>
+>>>>>>> planning
         </div>
 
       </div>
@@ -2213,6 +2281,7 @@ if (isset($_GET['delete_ingredient'])) {
   <script>
 
     <?php if (!empty($newObjectives)): ?>
+<<<<<<< HEAD
 
       // Show modal on page load
 
@@ -2222,6 +2291,16 @@ if (isset($_GET['delete_ingredient'])) {
 
         modal.show();
 
+=======
+      // Afficher le modal une seule fois par session
+      document.addEventListener('DOMContentLoaded', function() {
+        var sessionKey = 'objectivesModalShown_<?php echo md5(serialize(array_column($newObjectives, "id_objectif"))); ?>';
+        if (!sessionStorage.getItem(sessionKey)) {
+          var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
+          modal.show();
+          sessionStorage.setItem(sessionKey, '1');
+        }
+>>>>>>> planning
       });
 
     <?php endif; ?>

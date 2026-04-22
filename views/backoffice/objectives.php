@@ -86,40 +86,34 @@ if (isset($_GET['delete'])) {
       word-break: break-word;
     }
 
-    .objectives-table th,
-    .objectives-table td {
-      vertical-align: middle;
-    }
-
     @media (max-width: 1200px) {
-      .objectives-table td.description-cell {
-        max-width: 180px;
-      }
+      .objectives-table td.description-cell { max-width: 180px; }
     }
-
     @media (max-width: 992px) {
-      .objectives-table th:nth-child(2),
-      .objectives-table td:nth-child(2),
-      .objectives-table th:nth-child(8),
-      .objectives-table td:nth-child(8) {
-        display: none;
-      }
+      .objectives-table th:nth-child(2), .objectives-table td:nth-child(2),
+      .objectives-table th:nth-child(8), .objectives-table td:nth-child(8) { display: none; }
+    }
+    @media (max-width: 768px) {
+      .objectives-table th:nth-child(1), .objectives-table td:nth-child(1),
+      .objectives-table th:nth-child(4), .objectives-table td:nth-child(4),
+      .objectives-table th:nth-child(6), .objectives-table td:nth-child(6),
+      .objectives-table th:nth-child(10), .objectives-table td:nth-child(10) { display: none; }
+      .objectives-table td.description-cell { max-width: 140px; }
     }
 
-    @media (max-width: 768px) {
-      .objectives-table th:nth-child(1),
-      .objectives-table td:nth-child(1),
-      .objectives-table th:nth-child(4),
-      .objectives-table td:nth-child(4),
-      .objectives-table th:nth-child(6),
-      .objectives-table td:nth-child(6),
-      .objectives-table th:nth-child(10),
-      .objectives-table td:nth-child(10) {
-        display: none;
-      }
-      .objectives-table td.description-cell {
-        max-width: 140px;
-      }
+    /* Stat cards */
+    .stat-card { border: none; border-radius: 12px; transition: transform .15s; }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card .stat-icon {
+      width: 48px; height: 48px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+
+    /* Card headers */
+    .card-header-colored {
+      border-radius: 10px 10px 0 0 !important;
+      border-bottom: none;
+      padding: 1rem 1.25rem;
     }
   </style>
 </head>
@@ -176,52 +170,28 @@ if (isset($_GET['delete'])) {
   </nav>
 
   <!-- SIDEBAR -->
-  <aside id="sidebar" class="sidebar bg-white border-end">
-    <div class="d-flex flex-column h-100">
-      <!-- Logo -->
-      <div class="p-3 border-bottom">
-        <a href="index.php" class="d-flex align-items-center text-decoration-none">
-          <img src="assets/images/logooo.png" alt="Logo" width="32" height="32" class="me-2">
-          <span class="fw-bold text-dark">NutriMind</span>
-        </a>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="flex-grow-1 p-3">
-        <ul class="nav nav-pills flex-column gap-2">
-          <li class="nav-item">
-            <a href="index.php" class="nav-link">
-              <i class="ti ti-dashboard me-2"></i>Dashboard
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="inventory.html" class="nav-link">
-              <i class="ti ti-package me-2"></i>Inventory
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="users.php" class="nav-link">
-              <i class="ti ti-users me-2"></i>Users
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="planning_list.php" class="nav-link">
-              <i class="ti ti-calendar me-2"></i>Planning
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="objectives.php" class="nav-link active">
-              <i class="ti ti-target me-2"></i>Objectives
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="reports.html" class="nav-link">
-              <i class="ti ti-chart-bar me-2"></i>Reports
-            </a>
-          </li>
-        </ul>
-      </nav>
+  <aside id="sidebar" class="sidebar">
+    <div class="logo-area">
+     <a href="index.php" class="d-inline-flex"><img src="assets/images/logooo.png" alt="Nutrimind" style="max-height: 50px; width: auto;"></a>
     </div>
+    <ul class="nav flex-column">
+      <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
+      <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span
+            class="nav-text">Tableau de bord</span></a></li>
+      <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
+            class="nav-text">Utilisateurs</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
+      <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
+            class="nav-text">Gérer les plans</span></a></li>
+      <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
+            class="nav-text">Créer un plan</span></a></li>
+      <li><a class="nav-link active" href="objectives.php"><i class="ti ti-target"></i><span
+            class="nav-text">Objectifs</span></a></li>
+
+      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
+      </li>
+    </ul>
   </aside>
 
   <!-- MAIN CONTENT -->
@@ -230,8 +200,8 @@ if (isset($_GET['delete'])) {
       <!-- Page Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h1 class="h3 mb-0">Objectives Management</h1>
-          <p class="text-muted">Manage user objectives</p>
+          <h1 class="h3 mb-0">Gestion des Objectifs</h1>
+          <p class="text-muted">Gérer les objectifs des utilisateurs</p>
         </div>
       </div>
 
@@ -249,10 +219,72 @@ if (isset($_GET['delete'])) {
         </div>
       <?php endif; ?>
 
+      <!-- Stat Cards -->
+      <?php
+        $total    = count($objectives);
+        $active   = count(array_filter($objectives, fn($o) => strtolower($o['statut']) === 'active'));
+        $inactive = count(array_filter($objectives, fn($o) => strtolower($o['statut']) === 'inactive'));
+        $pending  = count(array_filter($objectives, fn($o) => strtolower($o['statut']) === 'pending'));
+      ?>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="card stat-card p-3" style="background: linear-gradient(135deg,#6366f1,#818cf8);">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon bg-white bg-opacity-25 text-white"><i class="ti ti-list-check"></i></div>
+              <div class="text-white">
+                <div class="fs-4 fw-bold"><?php echo $total; ?></div>
+                <div class="small opacity-75">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card stat-card p-3" style="background: linear-gradient(135deg,#10b981,#34d399);">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon bg-white bg-opacity-25 text-white"><i class="ti ti-circle-check"></i></div>
+              <div class="text-white">
+                <div class="fs-4 fw-bold"><?php echo $active; ?></div>
+                <div class="small opacity-75">Actifs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card stat-card p-3" style="background: linear-gradient(135deg,#f59e0b,#fbbf24);">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon bg-white bg-opacity-25 text-white"><i class="ti ti-clock"></i></div>
+              <div class="text-white">
+                <div class="fs-4 fw-bold"><?php echo $pending; ?></div>
+                <div class="small opacity-75">En attente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card stat-card p-3" style="background: linear-gradient(135deg,#ef4444,#f87171);">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon bg-white bg-opacity-25 text-white"><i class="ti ti-circle-x"></i></div>
+              <div class="text-white">
+                <div class="fs-4 fw-bold"><?php echo $inactive; ?></div>
+                <div class="small opacity-75">Inactifs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Section -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <input type="text" id="objectivesSearchInput" placeholder="Rechercher des objectifs..."
+                 class="form-control" style="max-width: 300px;">
+        </div>
+      </div>
+
       <!-- Objectives Table -->
       <div class="card objectives-card">
-        <div class="card-header">
-          <h5 class="mb-0">All Objectives</h5>
+        <div class="card-header card-header-colored" style="background: linear-gradient(135deg,#6366f1,#818cf8);">
+          <h5 class="mb-0 text-white"><i class="ti ti-target me-2"></i>Tous les objectifs</h5>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -260,30 +292,39 @@ if (isset($_GET['delete'])) {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>User</th>
+                  <th>Utilisateur</th>
                   <th>Type</th>
-                  <th>Target Value</th>
-                  <th>Initial Weight</th>
-                  <th>Deadline</th>
-                  <th>Status</th>
-                  <th>Priority</th>
+                  <th>Valeur cible</th>
+                  <th>Poids initial</th>
+                  <th>Date limite</th>
+                  <th>Statut</th>
+                  <th>Priorité</th>
                   <th>Description</th>
-                  <th>Created</th>
+                  <th>Créé le</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="objectivesTableBody">
                 <?php if (!empty($objectives)): ?>
                   <?php foreach ($objectives as $obj): ?>
+                    <?php
+                      $statut = strtolower($obj['statut']);
+                      $badgeColor = match($statut) {
+                        'active'   => 'success',
+                        'pending'  => 'warning',
+                        'inactive' => 'danger',
+                        default    => 'secondary'
+                      };
+                    ?>
                     <tr>
                       <td><?php echo htmlspecialchars($obj['id_objectif']); ?></td>
-                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Unknown'); ?></td>
+                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Inconnu'); ?></td>
                       <td><?php echo htmlspecialchars($obj['type_objectif']); ?></td>
                       <td><?php echo htmlspecialchars($obj['valeur_cible']); ?></td>
                       <td><?php echo htmlspecialchars($obj['poids_initial']); ?></td>
                       <td><?php echo htmlspecialchars($obj['date_limite']); ?></td>
                       <td>
-                        <span class="badge bg-<?php echo $obj['statut'] === 'active' ? 'success' : 'secondary'; ?>">
+                        <span class="badge bg-<?php echo $badgeColor; ?>">
                           <?php echo htmlspecialchars($obj['statut']); ?>
                         </span>
                       </td>
@@ -293,7 +334,7 @@ if (isset($_GET['delete'])) {
                       <td>
                         <div class="btn-group" role="group">
                           <a href="?delete=<?php echo $obj['id_objectif']; ?>" class="btn btn-sm btn-outline-danger"
-                             onclick="return confirm('Are you sure you want to delete this objective?')">
+                             onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?')">
                             <i class="ti ti-trash"></i>
                           </a>
                         </div>
@@ -302,7 +343,7 @@ if (isset($_GET['delete'])) {
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="11" class="text-center">No objectives found.</td>
+                    <td colspan="11" class="text-center">Aucun objectif trouvé.</td>
                   </tr>
                 <?php endif; ?>
               </tbody>
@@ -310,10 +351,23 @@ if (isset($_GET['delete'])) {
           </div>
         </div>
       </div>
+
+      <!-- Statistics Section -->
+      <div class="card mt-4">
+        <div class="card-header card-header-colored" style="background: linear-gradient(135deg,#10b981,#34d399);">
+          <h5 class="mb-0 text-white"><i class="ti ti-chart-pie me-2"></i>Statistiques des objectifs</h5>
+        </div>
+        <div class="card-body d-flex justify-content-center">
+          <div style="max-width: 380px; width: 100%;">
+            <canvas id="objectiveStatsPie"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script>
     // Sidebar toggle
     const toggleBtn = document.getElementById('toggleBtn');
@@ -337,6 +391,97 @@ if (isset($_GET['delete'])) {
         sidebar.classList.remove('show');
         overlay.classList.remove('show');
       }
+    });
+
+    // Dynamic search functionality
+    const searchInput = document.getElementById('objectivesSearchInput');
+    const tableBody = document.getElementById('objectivesTableBody');
+    const tableRows = tableBody.getElementsByTagName('tr');
+
+    searchInput.addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].textContent.toLowerCase().includes(searchTerm)) {
+            found = true;
+            break;
+          }
+        }
+        row.style.display = found ? '' : 'none';
+      }
+    });
+
+    // Initialize pie chart for objectives statistics
+    function initializeObjectiveStatsChart() {
+      const rows = document.querySelectorAll('#objectivesTableBody tr:not([style*="display: none"])');
+      const statusCounts = {};
+      
+      rows.forEach(row => {
+        const statusCell = row.cells[6];
+        if (statusCell) {
+          const status = statusCell.textContent.trim().toLowerCase();
+          statusCounts[status] = (statusCounts[status] || 0) + 1;
+        }
+      });
+
+      const labels = Object.keys(statusCounts).map(s => s.charAt(0).toUpperCase() + s.slice(1));
+      const data = Object.values(statusCounts);
+      const palette = {
+        'active':'#10b981','actif':'#10b981',
+        'inactive':'#ef4444','inactif':'#ef4444',
+        'pending':'#f59e0b','en_attente':'#f59e0b','en attente':'#f59e0b',
+        'en_cours':'#6366f1','en cours':'#6366f1',
+        'termine':'#10b981','terminé':'#10b981',
+        'annule':'#ef4444','annulé':'#ef4444',
+        'cancelled':'#ef4444'
+      };
+      const backgroundColors = Object.keys(statusCounts).map(s => palette[s] || '#94a3b8');
+
+      const ctx = document.getElementById('objectiveStatsPie');
+      if (ctx && ctx.chart) { ctx.chart.destroy(); }
+
+      ctx.chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: backgroundColors,
+            borderColor: '#fff',
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '60%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { padding: 16, font: { size: 13 }, usePointStyle: true, pointStyleWidth: 10 }
+            },
+            title: {
+              display: true,
+              text: 'Objectifs par statut',
+              font: { size: 15, weight: 'bold' },
+              padding: { bottom: 16 }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize chart on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeObjectiveStatsChart();
+      
+      // Re-initialize chart when search changes
+      searchInput.addEventListener('keyup', function() {
+        setTimeout(initializeObjectiveStatsChart, 100);
+      });
     });
   </script>
 </body>
