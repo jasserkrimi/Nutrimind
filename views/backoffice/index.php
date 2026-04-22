@@ -51,29 +51,29 @@ $ingredients = $ingredientController->getAll();
 
 
 // Check for new objectives
-
 $newObjectives = [];
+$objectifModel = new Objectif();
 
-if (isset($_SESSION['user_id'])) {
+// Get the max objective ID the admin has already seen
+$lastSeenId = $_SESSION['admin_last_seen_objectif_id'] ?? 0;
 
-    if (empty($_SESSION['last_login'])) {
-
-        $profile = $userController->getProfile();
-
-        $_SESSION['last_login'] = $profile['last_login'] ?? null;
-
+// Handle "mark as seen" POST before fetching
+if (isset($_POST['mark_objectives_seen'])) {
+    $allForMax = $objectifModel->getAll();
+    if (!empty($allForMax)) {
+        $_SESSION['admin_last_seen_objectif_id'] = max(array_column($allForMax, 'id_objectif'));
     }
+    header('Location: index.php');
+    exit;
+}
 
-
-
-    if (!empty($_SESSION['last_login'])) {
-
-        $objectifModel = new Objectif();
-
-        $newObjectives = $objectifModel->getAddedAfter($_SESSION['last_login']);
-
+// Fetch only the single latest objective added after last seen
+$allObjectives = $objectifModel->getAll(); // already ordered DESC by date_creation
+foreach ($allObjectives as $obj) {
+    if ($obj['id_objectif'] > $lastSeenId) {
+        $newObjectives = [$obj]; // only the most recent one
+        break;
     }
-
 }
 
 
@@ -2445,182 +2445,71 @@ if (isset($_GET['delete_ingredient'])) {
 
   </style>
 
-<<<<<<< HEAD
-
-
-  <!-- New Objectives Modal -->
-
-=======
   <!-- Modal Nouveaux Objectifs -->
->>>>>>> planning
   <div class="modal fade" id="newObjectivesModal" tabindex="-1" aria-labelledby="newObjectivesModalLabel" aria-hidden="true">
-
     <div class="modal-dialog modal-lg">
-
       <div class="modal-content">
-
         <div class="modal-header">
-<<<<<<< HEAD
-
-          <h5 class="modal-title" id="newObjectivesModalLabel">New Objectives Added</h5>
-
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
-=======
           <h5 class="modal-title" id="newObjectivesModalLabel">Nouveaux objectifs ajoutés</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
->>>>>>> planning
         </div>
-
         <div class="modal-body">
-<<<<<<< HEAD
-
-          <p>The following objectives have been added since your last login:</p>
-
-=======
-          <p>Les objectifs suivants ont été ajoutés depuis votre dernière connexion :</p>
->>>>>>> planning
+          <p>Les objectifs suivants ont été ajoutés depuis votre dernière visite :</p>
           <div class="table-responsive">
-
             <table class="table table-striped">
-
               <thead>
-
                 <tr>
-<<<<<<< HEAD
-
-                  <th>User</th>
-
-                  <th>Type</th>
-
-                  <th>Target Value</th>
-
-                  <th>Deadline</th>
-
-                  <th>Status</th>
-
-                  <th>Created</th>
-
-=======
                   <th>Utilisateur</th>
                   <th>Type</th>
                   <th>Valeur cible</th>
                   <th>Date limite</th>
                   <th>Statut</th>
                   <th>Créé le</th>
->>>>>>> planning
                 </tr>
-
               </thead>
-
               <tbody>
-
                 <?php if (!empty($newObjectives)): ?>
-
                   <?php foreach ($newObjectives as $obj): ?>
-
                     <tr>
-<<<<<<< HEAD
-
-                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Unknown'); ?></td>
-
-=======
                       <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Inconnu'); ?></td>
->>>>>>> planning
                       <td><?php echo htmlspecialchars($obj['type_objectif']); ?></td>
-
                       <td><?php echo htmlspecialchars($obj['valeur_cible']); ?></td>
-
-                      <td><?php echo htmlspecialchars($obj['date_limite']); ?></td>
-
+                      <td><?php echo htmlspecialchars($obj['date_limite'] ?? '-'); ?></td>
                       <td><?php echo htmlspecialchars($obj['statut']); ?></td>
-
                       <td><?php echo htmlspecialchars($obj['date_creation']); ?></td>
-
                     </tr>
-
                   <?php endforeach; ?>
-
                 <?php else: ?>
-
                   <tr>
-<<<<<<< HEAD
-
-                    <td colspan="6" class="text-center">No new objectives.</td>
-
-=======
                     <td colspan="6" class="text-center">Aucun nouvel objectif.</td>
->>>>>>> planning
                   </tr>
-
                 <?php endif; ?>
-
               </tbody>
-
             </table>
-
           </div>
-
         </div>
-
         <div class="modal-footer">
-<<<<<<< HEAD
-
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
-          <a href="objectives.php" class="btn btn-primary">View All Objectives</a>
-
-=======
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <form method="POST" style="display:inline;">
+            <input type="hidden" name="mark_objectives_seen" value="1">
+            <button type="submit" class="btn btn-secondary">Marquer comme vu</button>
+          </form>
           <a href="objectives.php" class="btn btn-primary">Voir tous les objectifs</a>
->>>>>>> planning
         </div>
-
       </div>
-
     </div>
-
   </div>
 
-
-
   <script>
-
     <?php if (!empty($newObjectives)): ?>
-<<<<<<< HEAD
-
-      // Show modal on page load
-
+      // Afficher le modal automatiquement — une seule fois par lot de nouveaux objectifs
       document.addEventListener('DOMContentLoaded', function() {
-
         var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
-
         modal.show();
-
-=======
-      // Afficher le modal une seule fois par session
-      document.addEventListener('DOMContentLoaded', function() {
-        var sessionKey = 'objectivesModalShown_<?php echo md5(serialize(array_column($newObjectives, "id_objectif"))); ?>';
-        if (!sessionStorage.getItem(sessionKey)) {
-          var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
-          modal.show();
-          sessionStorage.setItem(sessionKey, '1');
-        }
->>>>>>> planning
       });
-
     <?php endif; ?>
-
   </script>
-
-
 
 </body>
 
-
-
-
-
 <!-- Mirrored from themewagon.github.io/inapp/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 09 Apr 2026 13:10:27 GMT -->
-
 </html>
