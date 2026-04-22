@@ -162,9 +162,18 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <div class="row g-3">
         <div class="col-12">
           <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Liste des Utilisateurs</h5>
+              <div class="d-flex gap-2">
+                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Rechercher par nom..." style="width: 250px;">
+                <button id="exportPdfBtn" class="btn btn-primary btn-sm">
+                  <i class="ti ti-download"></i> Exporter PDF
+                </button>
+              </div>
+            </div>
             <div class="card-body p-0">
               <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table id="usersTable" class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
                       <th>Utilisateur</th>
@@ -272,6 +281,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <script>
     // Logout function
@@ -407,6 +417,104 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             });
         });
+    });
+  </script>
+
+  <script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const table = document.getElementById('usersTable');
+      const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        const userName = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+        if (userName.includes(searchTerm)) {
+          rows[i].style.display = '';
+        } else {
+          rows[i].style.display = 'none';
+        }
+      }
+    });
+
+    // PDF Export functionality
+    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+      const table = document.getElementById('usersTable');
+      const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+      
+      let tableHTML = `
+        <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+          <thead>
+            <tr style="background-color: #f8f9fa; border: 2px solid #dee2e6;">
+              <th style="border: 2px solid #dee2e6; padding: 15px; text-align: left; font-weight: bold; width: 25%;">Utilisateur</th>
+              <th style="border: 2px solid #dee2e6; padding: 15px; text-align: left; font-weight: bold; width: 35%;">Courrier Électronique</th>
+              <th style="border: 2px solid #dee2e6; padding: 15px; text-align: left; font-weight: bold; width: 20%;">Rôle</th>
+              <th style="border: 2px solid #dee2e6; padding: 15px; text-align: left; font-weight: bold; width: 20%;">Date d'Inscription</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].style.display !== 'none') {
+          const cells = rows[i].getElementsByTagName('td');
+          if (cells.length >= 5) {
+            // Extract name from first cell (skip the avatar div)
+            let nameElement = cells[0].querySelector('p');
+            const userName = nameElement ? nameElement.textContent.trim() : cells[0].textContent.trim().split(/\s+/)[0];
+            
+            // Extract email from second cell
+            const email = cells[1].textContent.trim();
+            
+            // Extract role from third cell (skip the badge span)
+            let roleElement = cells[2].querySelector('span.role-badge');
+            const role = roleElement ? roleElement.textContent.trim() : cells[2].textContent.trim();
+            
+            // Extract date from fourth cell
+            let dateElement = cells[3].querySelector('small');
+            const date = dateElement ? dateElement.textContent.trim() : cells[3].textContent.trim();
+
+            tableHTML += `
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="border: 1px solid #dee2e6; padding: 12px; width: 25%;">${userName}</td>
+                <td style="border: 1px solid #dee2e6; padding: 12px; width: 35%;">${email}</td>
+                <td style="border: 1px solid #dee2e6; padding: 12px; width: 20%;">${role}</td>
+                <td style="border: 1px solid #dee2e6; padding: 12px; width: 20%;">${date}</td>
+              </tr>
+            `;
+          }
+        }
+      }
+
+      tableHTML += `
+          </tbody>
+        </table>
+      `;
+
+      const element = document.createElement('div');
+      element.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px; padding-top: 10px;">
+          <h1 style="color: #302C4D; font-size: 36px; margin: 0; padding: 0;">Nutrimind</h1>
+          <h2 style="color: #E66239; font-size: 26px; margin: 5px 0; padding: 0;">Liste des Utilisateurs</h2>
+          <p style="color: #999; font-size: 12px; margin: 10px 0 0 0;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
+        </div>
+        <div style="margin: 30px 0;">
+          ${tableHTML}
+        </div>
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 11px;">
+          <p style="margin: 0;">© 2024 Nutrimind - Tous droits réservés</p>
+        </div>
+      `;
+
+      const opt = {
+        margin: 0.5,
+        filename: 'Nutrimind_Users_' + new Date().toLocaleDateString('fr-FR') + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().set(opt).from(element).save();
     });
   </script>
 
