@@ -170,30 +170,20 @@ if (isset($_SESSION['user_id'])) {
      <a href="index.php" class="d-inline-flex"><img src="assets/images/logooo.png" alt="Nutrimind" style="max-height: 50px; width: auto;"></a>
     </div>
     <ul class="nav flex-column">
-      <li class="px-4 py-2"><small class="nav-text">Main</small></li>
+      <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
       <li><a class="nav-link active" href="index.php"><i class="ti ti-home"></i><span
-            class="nav-text">Dashboard</span></a></li>
+            class="nav-text">Tableau de bord</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
-            class="nav-text">Users</span></a></li>
+            class="nav-text">Utilisateurs</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Manage Plans</span></a></li>
+            class="nav-text">Gérer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Create Plan</span></a></li>
+            class="nav-text">Créer un plan</span></a></li>
       <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
-            class="nav-text">Objectives</span></a></li>
-      <li><a class="nav-link" href="inventory.html"><i class="ti ti-box-seam"></i><span
-            class="nav-text">Inventory</span></a></li>
-      <li><a class="nav-link" href="create-product.html"><i class="ti ti-plus"></i><span class="nav-text">Add
-            Product</span></a></li>
-    <li><a class="nav-link" href="reports.html"><i class="ti ti-receipt"></i><span class="nav-text">Reports</span></a>
-      </li>
-    <li><a class="nav-link" href="404-error.html"><i class="ti ti-alert-circle"></i><span class="nav-text">404 Error</span></a>
-      </li>
-      <li><a class="nav-link" href="docs.html"><i class="ti ti-file-text"></i><span class="nav-text">Docs</span></a></li>
+            class="nav-text">Objectifs</span></a></li>
 
-
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
+      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
       </li>
     </ul>
@@ -212,6 +202,21 @@ if (isset($_SESSION['user_id'])) {
         </div>
       </div>
       <div class="row g-3 mb-3">
+        <div class="col-lg-3 col-12">
+          <a href="objectives.php" class="text-decoration-none">
+            <div class="card p-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-2 h-100" style="cursor:pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(13,110,253,0.15)'" onmouseout="this.style.boxShadow=''">
+              <div class="d-flex gap-3 align-items-center">
+                <div class="icon-shape icon-md bg-primary text-white rounded-2">
+                  <i class="ti ti-target fs-4"></i>
+                </div>
+                <div>
+                  <h2 class="mb-1 fs-6 text-body">Objectifs</h2>
+                  <p class="text-primary mb-0 small fw-semibold">Gérer les objectifs →</p>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
         <div class="col-lg-3 col-12">
 
           <div class="card p-4  bg-success bg-opacity-10 border border-success border-opacity-25 rounded-2">
@@ -871,33 +876,33 @@ if (isset($_SESSION['user_id'])) {
     }
   </style>
 
-  <!-- New Objectives Modal -->
+  <!-- Modal Nouveaux Objectifs -->
   <div class="modal fade" id="newObjectivesModal" tabindex="-1" aria-labelledby="newObjectivesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="newObjectivesModalLabel">New Objectives Added</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="newObjectivesModalLabel">Nouveaux objectifs ajoutés</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <p>The following objectives have been added since your last login:</p>
+          <p>Les objectifs suivants ont été ajoutés depuis votre dernière connexion :</p>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>User</th>
+                  <th>Utilisateur</th>
                   <th>Type</th>
-                  <th>Target Value</th>
-                  <th>Deadline</th>
-                  <th>Status</th>
-                  <th>Created</th>
+                  <th>Valeur cible</th>
+                  <th>Date limite</th>
+                  <th>Statut</th>
+                  <th>Créé le</th>
                 </tr>
               </thead>
               <tbody>
                 <?php if (!empty($newObjectives)): ?>
                   <?php foreach ($newObjectives as $obj): ?>
                     <tr>
-                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Unknown'); ?></td>
+                      <td><?php echo htmlspecialchars($obj['user_nom'] ?? 'Inconnu'); ?></td>
                       <td><?php echo htmlspecialchars($obj['type_objectif']); ?></td>
                       <td><?php echo htmlspecialchars($obj['valeur_cible']); ?></td>
                       <td><?php echo htmlspecialchars($obj['date_limite']); ?></td>
@@ -907,7 +912,7 @@ if (isset($_SESSION['user_id'])) {
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="6" class="text-center">No new objectives.</td>
+                    <td colspan="6" class="text-center">Aucun nouvel objectif.</td>
                   </tr>
                 <?php endif; ?>
               </tbody>
@@ -915,8 +920,8 @@ if (isset($_SESSION['user_id'])) {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <a href="objectives.php" class="btn btn-primary">View All Objectives</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="objectives.php" class="btn btn-primary">Voir tous les objectifs</a>
         </div>
       </div>
     </div>
@@ -924,10 +929,14 @@ if (isset($_SESSION['user_id'])) {
 
   <script>
     <?php if (!empty($newObjectives)): ?>
-      // Show modal on page load
+      // Afficher le modal une seule fois par session
       document.addEventListener('DOMContentLoaded', function() {
-        var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
-        modal.show();
+        var sessionKey = 'objectivesModalShown_<?php echo md5(serialize(array_column($newObjectives, "id_objectif"))); ?>';
+        if (!sessionStorage.getItem(sessionKey)) {
+          var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
+          modal.show();
+          sessionStorage.setItem(sessionKey, '1');
+        }
       });
     <?php endif; ?>
   </script>
