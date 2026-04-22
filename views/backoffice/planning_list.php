@@ -73,6 +73,11 @@ if (isset($_GET['delete'])) {
             class="nav-text">Tableau de bord</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
             class="nav-text">Utilisateurs</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
+      <li><a class="nav-link" href="index.php#meals-section"><i class="ti ti-tools-kitchen-2"></i><span
+            class="nav-text">Repas</span></a></li>
+      <li><a class="nav-link" href="index.php#ingredients-section"><i class="ti ti-leaf"></i><span
+            class="nav-text">Ingrédients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link active" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
             class="nav-text">Gérer les plans</span></a></li>

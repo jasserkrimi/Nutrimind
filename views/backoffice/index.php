@@ -415,75 +415,18 @@ if (isset($_GET['delete_ingredient'])) {
     </div>
 
     <ul class="nav flex-column">
-<<<<<<< HEAD
-
-      <li class="px-4 py-2"><small class="nav-text">Main</small></li>
-
-      <li><a class="nav-link active" href="index.php"><i class="ti ti-home"></i><span
-
-            class="nav-text">Dashboard</span></a></li>
-
-      <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
-
-            class="nav-text">Users</span></a></li>
-
-      <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
-
-      <li><a class="nav-link" href="#meals-section" onclick="scrollToSection('meals-section')"><i class="ti ti-utensils"></i><span
-
-            class="nav-text">Meals</span></a></li>
-
-      <li><a class="nav-link" href="#ingredients-section" onclick="scrollToSection('ingredients-section')"><i class="ti ti-leaf"></i><span
-
-            class="nav-text">Ingredients</span></a></li>
-
-=======
       <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
       <li><a class="nav-link active" href="index.php"><i class="ti ti-home"></i><span
             class="nav-text">Tableau de bord</span></a></li>
       <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span
             class="nav-text">Utilisateurs</span></a></li>
->>>>>>> planning
+      <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
+      <li><a class="nav-link" href="#meals-section"><i class="ti ti-tools-kitchen-2"></i><span
+            class="nav-text">Repas</span></a></li>
+      <li><a class="nav-link" href="#ingredients-section"><i class="ti ti-leaf"></i><span
+            class="nav-text">Ingrédients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
-
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-<<<<<<< HEAD
-
-            class="nav-text">Manage Plans</span></a></li>
-
-      <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-
-            class="nav-text">Create Plan</span></a></li>
-
-      <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
-
-            class="nav-text">Objectives</span></a></li>
-
-      <li><a class="nav-link" href="inventory.html"><i class="ti ti-box-seam"></i><span
-
-            class="nav-text">Inventory</span></a></li>
-
-      <li><a class="nav-link" href="create-product.html"><i class="ti ti-plus"></i><span class="nav-text">Add
-
-            Product</span></a></li>
-
-    <li><a class="nav-link" href="reports.html"><i class="ti ti-receipt"></i><span class="nav-text">Reports</span></a>
-
-      </li>
-
-    <li><a class="nav-link" href="404-error.html"><i class="ti ti-alert-circle"></i><span class="nav-text">404 Error</span></a>
-
-      </li>
-
-      <li><a class="nav-link" href="docs.html"><i class="ti ti-file-text"></i><span class="nav-text">Docs</span></a></li>
-
-
-
-
-
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
-
-=======
             class="nav-text">Gérer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
             class="nav-text">Créer un plan</span></a></li>
@@ -491,14 +434,9 @@ if (isset($_GET['delete_ingredient'])) {
             class="nav-text">Objectifs</span></a></li>
 
       <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
->>>>>>> planning
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
-
       </li>
-
     </ul>
-
-
 
   </aside>
 
