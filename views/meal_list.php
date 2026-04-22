@@ -65,11 +65,26 @@ if (isset($_GET['delete'])) {
 				</div>
 			</div>
 
+			<!-- Search and Sort Controls -->
+			<div class="row mb-4">
+				<div class="col-md-6">
+					<input type="text" id="mealsSearchInput" class="form-control" placeholder="Rechercher les repas par nom...">
+				</div>
+				<div class="col-md-6">
+					<select id="mealsSortSelect" class="form-select">
+						<option value="name-asc">Trier par: Nom (A-Z)</option>
+						<option value="name-desc">Trier par: Nom (Z-A)</option>
+						<option value="date-newest">Trier par: Date (Plus récent)</option>
+						<option value="date-oldest">Trier par: Date (Plus ancien)</option>
+					</select>
+				</div>
+			</div>
+
 			<!-- Meals Table -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" id="mealsTable">
 							<thead class="table-dark">
 								<tr>
 									<th>Nom</th>
@@ -78,7 +93,7 @@ if (isset($_GET['delete'])) {
 									<th>Actions</th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="mealsTableBody">
 								<?php if (empty($meals)): ?>
 									<tr>
 										<td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td>
@@ -143,13 +158,81 @@ if (isset($_GET['delete'])) {
 	}
 
 	// Attach click handlers to delete buttons
-	document.querySelectorAll('.delete-meal').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			e.preventDefault();
-			const id = btn.getAttribute('data-id');
-			showDeleteModal(id);
+	function reattachMealDeleteHandlers() {
+		document.querySelectorAll('.delete-meal').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				e.preventDefault();
+				const id = btn.getAttribute('data-id');
+				showDeleteModal(id);
+			});
 		});
-	});
+	}
+
+	// Initial attachment
+	reattachMealDeleteHandlers();
+
+	// ===== MEALS SEARCH AND SORT FUNCTIONALITY =====
+	const mealsSearchInput = document.getElementById('mealsSearchInput');
+	const mealsSortSelect = document.getElementById('mealsSortSelect');
+	const mealsTableBody = document.getElementById('mealsTableBody');
+	let mealsData = [];
+
+	// Collect initial meals data
+	function initializeMealsData() {
+		mealsData = [];
+		const rows = mealsTableBody.querySelectorAll('tr');
+		rows.forEach(row => {
+			const cells = row.querySelectorAll('td');
+			if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun repas trouvé') {
+				mealsData.push({
+					name: cells[0].textContent.trim(),
+					date: cells[1].textContent.trim(),
+					notes: cells[2].textContent.trim(),
+					actions: cells[3].innerHTML,
+					originalHTML: row.innerHTML
+				});
+			}
+		});
+	}
+
+	// Filter and sort meals
+	function filterAndSortMeals() {
+		const searchTerm = mealsSearchInput.value.toLowerCase();
+		const sortValue = mealsSortSelect.value;
+
+		let filteredMeals = mealsData.filter(meal => 
+			meal.name.toLowerCase().includes(searchTerm)
+		);
+
+		// Sort meals
+		if (sortValue === 'name-asc') {
+			filteredMeals.sort((a, b) => a.name.localeCompare(b.name));
+		} else if (sortValue === 'name-desc') {
+			filteredMeals.sort((a, b) => b.name.localeCompare(a.name));
+		} else if (sortValue === 'date-newest') {
+			filteredMeals.sort((a, b) => new Date(b.date) - new Date(a.date));
+		} else if (sortValue === 'date-oldest') {
+			filteredMeals.sort((a, b) => new Date(a.date) - new Date(b.date));
+		}
+
+		// Update table
+		if (filteredMeals.length === 0) {
+			mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td></tr>';
+		} else {
+			mealsTableBody.innerHTML = filteredMeals.map(meal => 
+				`<tr><td>${meal.name}</td><td>${meal.date}</td><td>${meal.notes}</td><td>${meal.actions}</td></tr>`
+			).join('');
+			// Re-attach delete handlers
+			reattachMealDeleteHandlers();
+		}
+	}
+
+	// Event listeners for meals
+	if (mealsSearchInput && mealsSortSelect) {
+		mealsSearchInput.addEventListener('input', filterAndSortMeals);
+		mealsSortSelect.addEventListener('change', filterAndSortMeals);
+		initializeMealsData();
+	}
 </script>
 
 <style>
