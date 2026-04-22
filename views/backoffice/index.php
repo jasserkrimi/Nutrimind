@@ -1459,11 +1459,37 @@ if (isset($_GET['delete_ingredient'])) {
 
               <?php endif; ?>
 
+              <!-- Search and Sort Controls for Meals -->
 
+              <div class="row mb-3 g-2">
+
+                <div class="col-md-6">
+
+                  <input type="text" id="mealsSearchInput" class="form-control" placeholder="Rechercher les repas par nom...">
+
+                </div>
+
+                <div class="col-md-6">
+
+                  <select id="mealsSortSelect" class="form-select">
+
+                    <option value="name-asc">Trier par: Nom (A-Z)</option>
+
+                    <option value="name-desc">Trier par: Nom (Z-A)</option>
+
+                    <option value="date-newest">Trier par: Date (Plus récent)</option>
+
+                    <option value="date-oldest">Trier par: Date (Plus ancien)</option>
+
+                  </select>
+
+                </div>
+
+              </div>
 
               <div class="table-responsive">
 
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="mealsTable">
 
                   <thead class="table-dark">
 
@@ -1481,7 +1507,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                   </thead>
 
-                  <tbody>
+                  <tbody id="mealsTableBody">
 
                     <?php if (empty($meals)): ?>
 
@@ -1547,9 +1573,41 @@ if (isset($_GET['delete_ingredient'])) {
 
             <div class="card-body p-4">
 
+              <!-- Search and Sort Controls for Ingredients -->
+
+              <div class="row mb-3 g-2">
+
+                <div class="col-md-6">
+
+                  <input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrédients par nom...">
+
+                </div>
+
+                <div class="col-md-6">
+
+                  <select id="ingredientsSortSelect" class="form-select">
+
+                    <option value="name-asc">Trier par: Nom (A-Z)</option>
+
+                    <option value="name-desc">Trier par: Nom (Z-A)</option>
+
+                    <option value="calories-high">Trier par: Calories (Haut à Bas)</option>
+
+                    <option value="calories-low">Trier par: Calories (Bas à Haut)</option>
+
+                    <option value="protein-high">Trier par: Protéines (Haut à Bas)</option>
+
+                    <option value="protein-low">Trier par: Protéines (Bas à Haut)</option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
               <div class="table-responsive">
 
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="ingredientsTable">
 
                   <thead class="table-dark">
 
@@ -1571,7 +1629,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                   </thead>
 
-                  <tbody>
+                  <tbody id="ingredientsTableBody">
 
                     <?php if (empty($ingredients)): ?>
 
@@ -1864,6 +1922,316 @@ if (isset($_GET['delete_ingredient'])) {
             }
 
         };
+
+
+
+        // ===== MEALS SEARCH AND SORT FUNCTIONALITY =====
+
+        const mealsSearchInput = document.getElementById('mealsSearchInput');
+
+        const mealsSortSelect = document.getElementById('mealsSortSelect');
+
+        const mealsTableBody = document.getElementById('mealsTableBody');
+
+        let mealsData = [];
+
+
+
+        // Collect initial meals data
+
+        function initializeMealsData() {
+
+            mealsData = [];
+
+            const rows = mealsTableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+
+                const cells = row.querySelectorAll('td');
+
+                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun repas trouvé') {
+
+                    mealsData.push({
+
+                        name: cells[0].textContent.trim(),
+
+                        date: cells[1].textContent.trim(),
+
+                        notes: cells[2].textContent.trim(),
+
+                        actions: cells[3].innerHTML,
+
+                        originalHTML: row.innerHTML
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+
+        // Filter and sort meals
+
+        function filterAndSortMeals() {
+
+            const searchTerm = mealsSearchInput.value.toLowerCase();
+
+            const sortValue = mealsSortSelect.value;
+
+
+
+            let filteredMeals = mealsData.filter(meal => 
+
+                meal.name.toLowerCase().includes(searchTerm)
+
+            );
+
+
+
+            // Sort meals
+
+            if (sortValue === 'name-asc') {
+
+                filteredMeals.sort((a, b) => a.name.localeCompare(b.name));
+
+            } else if (sortValue === 'name-desc') {
+
+                filteredMeals.sort((a, b) => b.name.localeCompare(a.name));
+
+            } else if (sortValue === 'date-newest') {
+
+                filteredMeals.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            } else if (sortValue === 'date-oldest') {
+
+                filteredMeals.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            }
+
+
+
+            // Update table
+
+            if (filteredMeals.length === 0) {
+
+                mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td></tr>';
+
+            } else {
+
+                mealsTableBody.innerHTML = filteredMeals.map(meal => 
+
+                    `<tr><td>${meal.name}</td><td>${meal.date}</td><td>${meal.notes}</td><td>${meal.actions}</td></tr>`
+
+                ).join('');
+
+                // Re-attach delete handlers
+
+                reattachDeleteHandlers();
+
+            }
+
+        }
+
+
+
+        // ===== INGREDIENTS SEARCH AND SORT FUNCTIONALITY =====
+
+        const ingredientsSearchInput = document.getElementById('ingredientsSearchInput');
+
+        const ingredientsSortSelect = document.getElementById('ingredientsSortSelect');
+
+        const ingredientsTableBody = document.getElementById('ingredientsTableBody');
+
+        let ingredientsData = [];
+
+
+
+        // Collect initial ingredients data
+
+        function initializeIngredientsData() {
+
+            ingredientsData = [];
+
+            const rows = ingredientsTableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+
+                const cells = row.querySelectorAll('td');
+
+                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun ingrédient trouvé') {
+
+                    ingredientsData.push({
+
+                        name: cells[0].textContent.trim(),
+
+                        calories: parseFloat(cells[1].textContent.trim()) || 0,
+
+                        proteins: parseFloat(cells[2].textContent.trim()) || 0,
+
+                        glucides: cells[3].textContent.trim(),
+
+                        lipides: cells[4].textContent.trim(),
+
+                        actions: cells[5].innerHTML,
+
+                        originalHTML: row.innerHTML
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+
+        // Filter and sort ingredients
+
+        function filterAndSortIngredients() {
+
+            const searchTerm = ingredientsSearchInput.value.toLowerCase();
+
+            const sortValue = ingredientsSortSelect.value;
+
+
+
+            let filteredIngredients = ingredientsData.filter(ing => 
+
+                ing.name.toLowerCase().includes(searchTerm)
+
+            );
+
+
+
+            // Sort ingredients
+
+            if (sortValue === 'name-asc') {
+
+                filteredIngredients.sort((a, b) => a.name.localeCompare(b.name));
+
+            } else if (sortValue === 'name-desc') {
+
+                filteredIngredients.sort((a, b) => b.name.localeCompare(a.name));
+
+            } else if (sortValue === 'calories-high') {
+
+                filteredIngredients.sort((a, b) => b.calories - a.calories);
+
+            } else if (sortValue === 'calories-low') {
+
+                filteredIngredients.sort((a, b) => a.calories - b.calories);
+
+            } else if (sortValue === 'protein-high') {
+
+                filteredIngredients.sort((a, b) => b.proteins - a.proteins);
+
+            } else if (sortValue === 'protein-low') {
+
+                filteredIngredients.sort((a, b) => a.proteins - b.proteins);
+
+            }
+
+
+
+            // Update table
+
+            if (filteredIngredients.length === 0) {
+
+                ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td></tr>';
+
+            } else {
+
+                ingredientsTableBody.innerHTML = filteredIngredients.map(ing => 
+
+                    `<tr><td>${ing.name}</td><td>${ing.calories}</td><td>${ing.proteins}</td><td>${ing.glucides}</td><td>${ing.lipides}</td><td>${ing.actions}</td></tr>`
+
+                ).join('');
+
+                // Re-attach delete handlers
+
+                reattachDeleteHandlers();
+
+            }
+
+        }
+
+
+
+        // Re-attach delete handlers after table update
+
+        function reattachDeleteHandlers() {
+
+            document.querySelectorAll('.delete-meal').forEach(button => {
+
+                button.addEventListener('click', function(e) {
+
+                    e.preventDefault();
+
+                    const mealId = this.getAttribute('data-id');
+
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+
+                        window.location.href = `index.php?delete_meal=${mealId}`;
+
+                    }
+
+                });
+
+            });
+
+
+
+            document.querySelectorAll('.delete-ingredient').forEach(button => {
+
+                button.addEventListener('click', function(e) {
+
+                    e.preventDefault();
+
+                    const ingredientId = this.getAttribute('data-id');
+
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+
+                        window.location.href = `index.php?delete_ingredient=${ingredientId}`;
+
+                    }
+
+                });
+
+            });
+
+        }
+
+
+
+        // Event listeners for meals
+
+        if (mealsSearchInput && mealsSortSelect) {
+
+            mealsSearchInput.addEventListener('input', filterAndSortMeals);
+
+            mealsSortSelect.addEventListener('change', filterAndSortMeals);
+
+            initializeMealsData();
+
+        }
+
+
+
+        // Event listeners for ingredients
+
+        if (ingredientsSearchInput && ingredientsSortSelect) {
+
+            ingredientsSearchInput.addEventListener('input', filterAndSortIngredients);
+
+            ingredientsSortSelect.addEventListener('change', filterAndSortIngredients);
+
+            initializeIngredientsData();
+
+        }
 
     });
 

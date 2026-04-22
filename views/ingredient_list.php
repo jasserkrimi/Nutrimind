@@ -65,11 +65,28 @@ if (isset($_GET['delete'])) {
 				</div>
 			</div>
 
+			<!-- Search and Sort Controls -->
+			<div class="row mb-4">
+				<div class="col-md-6">
+					<input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrédients par nom...">
+				</div>
+				<div class="col-md-6">
+					<select id="ingredientsSortSelect" class="form-select">
+						<option value="name-asc">Trier par: Nom (A-Z)</option>
+						<option value="name-desc">Trier par: Nom (Z-A)</option>
+						<option value="calories-high">Trier par: Calories (Haut à Bas)</option>
+						<option value="calories-low">Trier par: Calories (Bas à Haut)</option>
+						<option value="protein-high">Trier par: Protéines (Haut à Bas)</option>
+						<option value="protein-low">Trier par: Protéines (Bas à Haut)</option>
+					</select>
+				</div>
+			</div>
+
 			<!-- Ingredients Table -->
 			<div class="row">
 				<div class="col-lg-12">
 					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" id="ingredientsTable">
 							<thead class="table-dark">
 								<tr>
 									<th>Nom</th>
@@ -80,7 +97,7 @@ if (isset($_GET['delete'])) {
 									<th>Actions</th>
 								</tr>
 							</thead>
-							<tbody>
+							<tbody id="ingredientsTableBody">
 								<?php if (empty($ingredients)): ?>
 									<tr>
 										<td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td>
@@ -147,13 +164,87 @@ if (isset($_GET['delete'])) {
 	}
 
 	// Attach click handlers to delete buttons
-	document.querySelectorAll('.delete-ingredient').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			e.preventDefault();
-			const id = btn.getAttribute('data-id');
-			showDeleteModal(id);
+	function reattachIngredientDeleteHandlers() {
+		document.querySelectorAll('.delete-ingredient').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				e.preventDefault();
+				const id = btn.getAttribute('data-id');
+				showDeleteModal(id);
+			});
 		});
-	});
+	}
+
+	// Initial attachment
+	reattachIngredientDeleteHandlers();
+
+	// ===== INGREDIENTS SEARCH AND SORT FUNCTIONALITY =====
+	const ingredientsSearchInput = document.getElementById('ingredientsSearchInput');
+	const ingredientsSortSelect = document.getElementById('ingredientsSortSelect');
+	const ingredientsTableBody = document.getElementById('ingredientsTableBody');
+	let ingredientsData = [];
+
+	// Collect initial ingredients data
+	function initializeIngredientsData() {
+		ingredientsData = [];
+		const rows = ingredientsTableBody.querySelectorAll('tr');
+		rows.forEach(row => {
+			const cells = row.querySelectorAll('td');
+			if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun ingrédient trouvé') {
+				ingredientsData.push({
+					name: cells[0].textContent.trim(),
+					calories: parseFloat(cells[1].textContent.trim()) || 0,
+					proteins: parseFloat(cells[2].textContent.trim()) || 0,
+					glucides: cells[3].textContent.trim(),
+					lipides: cells[4].textContent.trim(),
+					actions: cells[5].innerHTML,
+					originalHTML: row.innerHTML
+				});
+			}
+		});
+	}
+
+	// Filter and sort ingredients
+	function filterAndSortIngredients() {
+		const searchTerm = ingredientsSearchInput.value.toLowerCase();
+		const sortValue = ingredientsSortSelect.value;
+
+		let filteredIngredients = ingredientsData.filter(ing => 
+			ing.name.toLowerCase().includes(searchTerm)
+		);
+
+		// Sort ingredients
+		if (sortValue === 'name-asc') {
+			filteredIngredients.sort((a, b) => a.name.localeCompare(b.name));
+		} else if (sortValue === 'name-desc') {
+			filteredIngredients.sort((a, b) => b.name.localeCompare(a.name));
+		} else if (sortValue === 'calories-high') {
+			filteredIngredients.sort((a, b) => b.calories - a.calories);
+		} else if (sortValue === 'calories-low') {
+			filteredIngredients.sort((a, b) => a.calories - b.calories);
+		} else if (sortValue === 'protein-high') {
+			filteredIngredients.sort((a, b) => b.proteins - a.proteins);
+		} else if (sortValue === 'protein-low') {
+			filteredIngredients.sort((a, b) => a.proteins - b.proteins);
+		}
+
+		// Update table
+		if (filteredIngredients.length === 0) {
+			ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td></tr>';
+		} else {
+			ingredientsTableBody.innerHTML = filteredIngredients.map(ing => 
+				`<tr><td>${ing.name}</td><td>${ing.calories}</td><td>${ing.proteins}</td><td>${ing.glucides}</td><td>${ing.lipides}</td><td>${ing.actions}</td></tr>`
+			).join('');
+			// Re-attach delete handlers
+			reattachIngredientDeleteHandlers();
+		}
+	}
+
+	// Event listeners for ingredients
+	if (ingredientsSearchInput && ingredientsSortSelect) {
+		ingredientsSearchInput.addEventListener('input', filterAndSortIngredients);
+		ingredientsSortSelect.addEventListener('change', filterAndSortIngredients);
+		initializeIngredientsData();
+	}
 </script>
 
 <style>
