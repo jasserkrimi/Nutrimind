@@ -237,5 +237,82 @@ class User {
 
         return $stmt->execute();
     }
+
+    /**
+     * Get users with pagination and search
+     */
+    public function getUsersPaginated($page = 1, $perPage = 10, $search = '') {
+        $offset = ($page - 1) * $perPage;
+        
+        $query = "SELECT id, nom, email, role, date_creation 
+                  FROM " . $this->table;
+        
+        if (!empty($search)) {
+            $query .= " WHERE nom LIKE :search OR email LIKE :search";
+        }
+        
+        $query .= " ORDER BY date_creation DESC LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($query);
+        
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $stmt->bindParam(':search', $searchParam);
+        }
+        
+        $stmt->bindValue(':limit', (int)$perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get total count of users with optional search
+     */
+    public function getTotalUsersCount($search = '') {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        
+        if (!empty($search)) {
+            $query .= " WHERE nom LIKE :search OR email LIKE :search";
+        }
+        
+        $stmt = $this->db->prepare($query);
+        
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $stmt->bindParam(':search', $searchParam);
+        }
+        
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return (int)$result['total'];
+    }
+
+    /**
+     * Get all users for export (no pagination)
+     */
+    public function getAllUsersForExport($search = '') {
+        $query = "SELECT id, nom, email, role, date_creation 
+                  FROM " . $this->table;
+        
+        if (!empty($search)) {
+            $query .= " WHERE nom LIKE :search OR email LIKE :search";
+        }
+        
+        $query .= " ORDER BY date_creation DESC";
+        
+        $stmt = $this->db->prepare($query);
+        
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $stmt->bindParam(':search', $searchParam);
+        }
+        
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

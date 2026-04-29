@@ -311,6 +311,53 @@ class UserController {
             }
         }
     }
+
+    /**
+     * Get users with pagination and search
+     */
+    public function getUsersPaginated() {
+        // Check if user is logged in and is admin
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return ['success' => false, 'errors' => ['Unauthorized access']];
+        }
+
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+        $users = $this->user->getUsersPaginated($page, $perPage, $search);
+        $totalUsers = $this->user->getTotalUsersCount($search);
+        $totalPages = ceil($totalUsers / $perPage);
+
+        return [
+            'success' => true,
+            'users' => $users,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total_users' => $totalUsers,
+                'total_pages' => $totalPages
+            ]
+        ];
+    }
+
+    /**
+     * Get all users for export
+     */
+    public function getAllUsersForExport() {
+        // Check if user is logged in and is admin
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return ['success' => false, 'errors' => ['Unauthorized access']];
+        }
+
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $users = $this->user->getAllUsersForExport($search);
+
+        return [
+            'success' => true,
+            'users' => $users
+        ];
+    }
 }
 
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
@@ -347,6 +394,14 @@ if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
 
         case 'delete_user':
             $response = $controller->deleteUser();
+            break;
+
+        case 'get_users_paginated':
+            $response = $controller->getUsersPaginated();
+            break;
+
+        case 'get_all_users_export':
+            $response = $controller->getAllUsersForExport();
             break;
 
         case 'get_profile':
