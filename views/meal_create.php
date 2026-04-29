@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../controllers/MealController.php';
+require_once __DIR__ . '/../controllers/MealController.php';
 require_once __DIR__ . '/../models/Ingredient.php';
 
 $mealController = new MealController();
@@ -46,15 +46,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					<form method="POST" class="form">
 						<div class="form-group mb-4">
 							<label for="name" class="form-label font-weight-bold">Nom du repas <span class="text-danger">*</span></label>
-							<input type="text" class="form-control <?php echo isset($errors['name']) ? 'is-invalid' : ''; ?>" 
-								id="name" name="name" placeholder="Ex: Déjeuner du lundi" 
-								value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
+							<div class="d-flex">
+								<input type="text" class="form-control flex-grow-1 <?php echo isset($errors['name']) ? 'is-invalid' : ''; ?>" 
+									id="name" name="name" placeholder="Ex: Déjeuner du lundi" 
+									value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
+								<button type="button" class="btn btn-outline-primary ml-2" id="findRecipeBtn">🔍 Trouver recette automatiquement</button>
+							</div>
 							<?php if (isset($errors['name'])): ?>
 								<div class="invalid-feedback d-block">
 									<?php echo $errors['name']; ?>
 								</div>
 							<?php endif; ?>
 						</div>
+						<div id="recipeResults" class="mt-3" style="display: none;"></div>
 
 						<div class="form-group mb-4">
 							<label for="date" class="form-label font-weight-bold">Date du repas <span class="text-danger">*</span></label>
@@ -130,5 +134,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 	</div>
 	<!-- end create meal section -->
+
+	<script>
+		async function findRecipeSuggestion() {
+			const input = document.getElementById('name').value.trim();
+			const resultsDiv = document.getElementById('recipeResults');
+			resultsDiv.style.display = 'none';
+			resultsDiv.innerHTML = '';
+
+			if (!input) {
+				alert('Veuillez entrer un nom de repas.');
+				return;
+			}
+
+			try {
+				const datamuseResponse = await fetch(`https://api.datamuse.com/words?sl=${encodeURIComponent(input)}`);
+				if (!datamuseResponse.ok) {
+					throw new Error('Erreur Datamuse');
+				}
+				const words = await datamuseResponse.json();
+				const correctedWord = (words && words.length > 0 && words[0].word) ? words[0].word : input;
+
+				const mealResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(correctedWord)}`);
+				if (!mealResponse.ok) {
+					throw new Error('Erreur TheMealDB');
+				}
+				const mealData = await mealResponse.json();
+
+				if (!mealData.meals || mealData.meals.length === 0) {
+					alert('Aucune recette trouvée pour ce nom.');
+					return;
+				}
+
+				const meal = mealData.meals[0];
+				const ingredients = [];
+				for (let i = 1; i <= 20; i++) {
+					const ingredient = meal[`strIngredient${i}`];
+					const measure = meal[`strMeasure${i}`];
+					if (ingredient && ingredient.trim()) {
+						ingredients.push(`${measure ? measure.trim() : ''} ${ingredient.trim()}`.trim());
+					}
+				}
+
+				resultsDiv.innerHTML = `
+					<div class="card p-3">
+						<div class="row">
+							<div class="col-md-4 mb-3 mb-md-0">
+								<img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="img-fluid">
+							</div>
+							<div class="col-md-8">
+								<p><strong>Recette proposée :</strong> ${meal.strMeal}</p>
+								<p><strong>Catégorie :</strong> ${meal.strCategory || '–'}</p>
+								<p><strong>Ingrédients :</strong></p>
+								<ul>
+									${ingredients.map(item => `<li>${item}</li>`).join('')}
+								</ul>
+							</div>
+						</div>
+						<div class="mt-3">
+							<p><strong>Instructions :</strong></p>
+							<p>${meal.strInstructions ? meal.strInstructions.replace(/\n/g, '<br>') : 'Aucune instruction disponible.'}</p>
+						</div>
+					</div>
+				`;
+				resultsDiv.style.display = 'block';
+			} catch (error) {
+				alert('Erreur lors de la récupération de la recette.');
+			}
+		}
+
+		document.getElementById('findRecipeBtn').addEventListener('click', findRecipeSuggestion);
+	</script>
 
 <?php include 'footer.php'; ?>
