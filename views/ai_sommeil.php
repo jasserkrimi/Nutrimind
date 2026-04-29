@@ -32,7 +32,7 @@ $date     = htmlspecialchars($plans['generated_at']);
           </p>
         </div>
       </div>
-    </div>
+    </div> 
 
     <!-- Nav -->
     <div class="row mb-5">
