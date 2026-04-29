@@ -99,9 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 							<label for="description" class="form-label font-weight-bold">Description (optionnel)</label>
 							<textarea class="form-control" id="description" name="description" rows="4"
 								placeholder="Décrivez votre objectif en détail..." maxlength="1000"><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description']) : ''; ?></textarea>
-							<small class="form-text text-muted">
-								<span id="charCount">0</span>/1000 caractères
-							</small>
+							<div class="d-flex justify-content-between align-items-center mt-1">
+								<small id="descError" class="text-danger" style="display:none;"></small>
+								<small class="form-text text-muted ms-auto">
+									<span id="charCount">0</span>/1000 caractères
+								</small>
+							</div>
 						</div>
 
 						<div class="form-group mb-4">
@@ -133,53 +136,166 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 	</div>
 
+	<style>
+		.field-error { font-size: .82rem; color: #dc3545; margin-top: .25rem; display: none; }
+		.form-control.is-invalid { border-color: #dc3545; box-shadow: 0 0 0 .15rem rgba(220,53,69,.15); }
+		.form-control.is-valid   { border-color: #10b981; box-shadow: 0 0 0 .15rem rgba(16,185,129,.12); }
+		#charCount { font-weight: 600; }
+		#charCount.warn  { color: #f59e0b; }
+		#charCount.error { color: #dc3545; }
+		#charCount.ok    { color: #10b981; }
+	</style>
+
 	<script>
-		document.getElementById('valeur_cible').addEventListener('input', function() {
-			const value = parseFloat(this.value);
-			if (value <= 0 || value > 999.99) {
-				this.setCustomValidity('La valeur doit être entre 0.01 et 999.99');
-			} else {
-				this.setCustomValidity('');
-			}
-		});
+	(function () {
 
-		document.getElementById('poids_initial').addEventListener('input', function() {
-			const value = parseFloat(this.value);
-			if (this.value && (value <= 0 || value > 500)) {
-				this.setCustomValidity('Le poids doit être entre 0.01 et 500 kg');
-			} else {
-				this.setCustomValidity('');
-			}
-		});
+		// ── helpers ──────────────────────────────────────────────────────
+		function showError(field, msgEl, msg) {
+			field.classList.add('is-invalid');
+			field.classList.remove('is-valid');
+			msgEl.textContent = msg;
+			msgEl.style.display = 'inline';
+		}
+		function showValid(field, msgEl) {
+			field.classList.remove('is-invalid');
+			field.classList.add('is-valid');
+			msgEl.textContent = '';
+			msgEl.style.display = 'none';
+		}
+		function clearState(field, msgEl) {
+			field.classList.remove('is-invalid', 'is-valid');
+			if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
+		}
 
-		document.getElementById('date_limite').addEventListener('input', function() {
-			const selectedDate = new Date(this.value);
-			const today = new Date();
+		// ── type_objectif ────────────────────────────────────────────────
+		const typeField = document.getElementById('type_objectif');
+		const typeErr   = document.createElement('div');
+		typeErr.className = 'field-error';
+		typeField.parentNode.appendChild(typeErr);
+
+		function validateType() {
+			if (!typeField.value) {
+				showError(typeField, typeErr, 'Veuillez sélectionner un type d\'objectif.');
+				return false;
+			}
+			showValid(typeField, typeErr);
+			return true;
+		}
+		typeField.addEventListener('change', validateType);
+
+		// ── valeur_cible ─────────────────────────────────────────────────
+		const valeurField = document.getElementById('valeur_cible');
+		const valeurErr   = document.createElement('div');
+		valeurErr.className = 'field-error';
+		valeurField.parentNode.appendChild(valeurErr);
+
+		function validateValeur() {
+			const v = parseFloat(valeurField.value);
+			if (valeurField.value === '') {
+				showError(valeurField, valeurErr, 'La valeur cible est obligatoire.');
+				return false;
+			}
+			if (isNaN(v) || v <= 0) {
+				showError(valeurField, valeurErr, 'La valeur doit être un nombre positif.');
+				return false;
+			}
+			if (v > 999.99) {
+				showError(valeurField, valeurErr, 'La valeur ne peut pas dépasser 999.99.');
+				return false;
+			}
+			showValid(valeurField, valeurErr);
+			return true;
+		}
+		valeurField.addEventListener('input', validateValeur);
+
+		// ── poids_initial ────────────────────────────────────────────────
+		const poidsField = document.getElementById('poids_initial');
+		const poidsErr   = document.createElement('div');
+		poidsErr.className = 'field-error';
+		poidsField.parentNode.appendChild(poidsErr);
+
+		function validatePoids() {
+			if (poidsField.value === '') { clearState(poidsField, poidsErr); return true; }
+			const v = parseFloat(poidsField.value);
+			if (isNaN(v) || v <= 0 || v > 500) {
+				showError(poidsField, poidsErr, 'Le poids doit être entre 0.01 et 500 kg.');
+				return false;
+			}
+			showValid(poidsField, poidsErr);
+			return true;
+		}
+		poidsField.addEventListener('input', validatePoids);
+
+		// ── date_limite ──────────────────────────────────────────────────
+		const dateField = document.getElementById('date_limite');
+		const dateErr   = document.createElement('div');
+		dateErr.className = 'field-error';
+		dateField.parentNode.appendChild(dateErr);
+
+		function validateDate() {
+			if (dateField.value === '') { clearState(dateField, dateErr); return true; }
+			const selected = new Date(dateField.value);
+			const today    = new Date();
 			today.setHours(0, 0, 0, 0);
+			if (selected < today) {
+				showError(dateField, dateErr, 'La date limite doit être dans le futur.');
+				return false;
+			}
+			showValid(dateField, dateErr);
+			return true;
+		}
+		dateField.addEventListener('change', validateDate);
 
-			if (this.value && selectedDate < today) {
-				this.setCustomValidity('La date doit être dans le futur');
-			} else {
-				this.setCustomValidity('');
+		// ── description ──────────────────────────────────────────────────
+		const descField  = document.getElementById('description');
+		const descErr    = document.getElementById('descError');
+		const charCount  = document.getElementById('charCount');
+
+		function validateDesc() {
+			const len = descField.value.trim().length;
+			charCount.textContent = descField.value.length;
+
+			// colour counter
+			charCount.className = len === 0 ? '' : len < 15 ? 'error' : len > 900 ? 'warn' : 'ok';
+
+			if (descField.value.length > 0 && len < 15) {
+				showError(descField, descErr, `La description doit contenir au moins 15 caractères (${len}/15).`);
+				return false;
+			}
+			if (descField.value.length > 1000) {
+				showError(descField, descErr, 'La description ne peut pas dépasser 1000 caractères.');
+				return false;
+			}
+			clearState(descField, descErr);
+			if (descField.value.length > 0) descField.classList.add('is-valid');
+			return true;
+		}
+		descField.addEventListener('input', validateDesc);
+
+		// ── form submit ──────────────────────────────────────────────────
+		document.querySelector('form').addEventListener('submit', function (e) {
+			const ok = [
+				validateType(),
+				validateValeur(),
+				validatePoids(),
+				validateDate(),
+				validateDesc()
+			].every(Boolean);
+
+			if (!ok) {
+				e.preventDefault();
+				// Scroll to first error
+				const first = document.querySelector('.is-invalid');
+				if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 		});
 
-		document.getElementById('description').addEventListener('input', function() {
-			const length = this.value.length;
-			document.getElementById('charCount').textContent = length;
-
-			if (length > 1000) {
-				this.setCustomValidity('La description ne peut pas dépasser 1000 caractères');
-			} else {
-				this.setCustomValidity('');
-			}
+		// ── init on load ─────────────────────────────────────────────────
+		document.addEventListener('DOMContentLoaded', function () {
+			charCount.textContent = descField.value.length;
 		});
 
-		// Initialize character count on page load
-		document.addEventListener('DOMContentLoaded', function() {
-			const description = document.getElementById('description');
-			document.getElementById('charCount').textContent = description.value.length;
-		});
+	})();
 	</script>
 
 <?php include 'footer.php'; ?>
