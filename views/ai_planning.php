@@ -2,6 +2,7 @@
 session_start();
 require_once '../controllers/ObjectiveController.php';
 require_once '../config/Database.php';
+require_once '../config/secrets.php';
 require_once '../models/User.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -112,11 +113,11 @@ Chaque valeur doit être un plan détaillé en Markdown (utilise ##, ###, **, -,
 Tout en français. Sois précis et détaillé.
 PROMPT;
 
-$groq_key = "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";
-$groq_url = "https://api.groq.com/openai/v1/chat/completions";
+$groq_key = GROQ_API_KEY;
+$groq_url = GROQ_API_URL;
 
 $payload = json_encode([
-    "model"       => "llama-3.3-70b-versatile",
+    "model"       => GROQ_MODEL,
     "messages"    => [["role" => "user", "content" => $prompt]],
     "temperature" => 0.7,
     "max_tokens"  => 4000,

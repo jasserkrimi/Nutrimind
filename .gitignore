@@ -1,0 +1,14 @@
+# Secret keys — never commit these
+config/secrets.php
+
+# OS & editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# PHP logs & cache
+*.log
+/tmp/
