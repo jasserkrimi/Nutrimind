@@ -90,6 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
             class="nav-text">Objectifs</span></a></li>
 
+            <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span
+            class="nav-text">Activités Sportives</span></a></li>
+
       <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a>
       </li>

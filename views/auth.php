@@ -360,7 +360,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                     if (data.role && data.role.toLowerCase() === 'admin') {
                         window.location.href = 'backoffice/index.php';
                     } else {
-                        window.location.href = 'index.php';
+                        window.location.href = '../index.php';
                     }
                 } else {
                     if (data.errors) {
@@ -413,3 +413,4 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     </script>
 </body>
 </html>
+
