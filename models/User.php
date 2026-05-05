@@ -20,6 +20,10 @@ class User {
     public function __construct($db = null) {
         if ($db) {
             $this->db = $db;
+        } else {
+            require_once __DIR__ . '/../config/Database.php';
+            $database = new Database();
+            $this->db = $database->connect();
         }
     }
 
