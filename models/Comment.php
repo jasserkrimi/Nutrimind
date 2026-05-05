@@ -9,6 +9,7 @@ class Comment {
     public $id_comment;
     public $post_id;
     public $user_id;
+    public $parent_id;
     public $contenu;
     public $statut;
     public $date_creation;
@@ -24,13 +25,14 @@ class Comment {
      */
     public function create() {
         $query = "INSERT INTO " . $this->table . "
-                  (post_id, user_id, contenu, statut)
+                  (post_id, user_id, parent_id, contenu, statut)
                   VALUES
-                  (:post_id, :user_id, :contenu, :statut)";
+                  (:post_id, :user_id, :parent_id, :contenu, :statut)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':post_id', $this->post_id);
         $stmt->bindParam(':user_id', $this->user_id);
+        $stmt->bindParam(':parent_id', $this->parent_id);
         $stmt->bindParam(':contenu', $this->contenu);
         $stmt->bindParam(':statut',  $this->statut);
 
@@ -61,7 +63,9 @@ class Comment {
      * Get all approved comments for a given post (with author info)
      */
     public function getAllByPost($post_id, $only_approved = true) {
-        $query = "SELECT c.*, u.nom AS auteur_nom
+        $query = "SELECT c.*, u.nom AS auteur_nom,
+                         (SELECT COUNT(*) FROM comment_reaction cr WHERE cr.comment_id = c.id_comment AND cr.type = 'like') AS nb_likes,
+                         (SELECT COUNT(*) FROM comment_reaction cr WHERE cr.comment_id = c.id_comment AND cr.type = 'dislike') AS nb_dislikes
                   FROM " . $this->table . " c
                   LEFT JOIN user u ON c.user_id = u.id
                   WHERE c.post_id = :post_id";

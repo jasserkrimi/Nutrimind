@@ -53,6 +53,7 @@ class CommentController {
 
         $this->comment->post_id = $post_id;
         $this->comment->user_id = $user_id;
+        $this->comment->parent_id = isset($data['parent_id']) && is_numeric($data['parent_id']) && $data['parent_id'] > 0 ? (int)$data['parent_id'] : null;
         $this->comment->statut  = 'approuve'; // auto-approve for front
 
         if (empty($errors)) {

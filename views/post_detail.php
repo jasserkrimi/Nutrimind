@@ -60,6 +60,20 @@ if (isset($_GET['delete_comment']) && isset($_SESSION['user_id'])) {
 }
 
 $comments = $commentController->getAllByPost($id, true);
+
+$commentsTree = [];
+$replies = [];
+foreach ($comments as $c) {
+    if ($c['parent_id']) {
+        $replies[$c['parent_id']][] = $c;
+    } else {
+        $commentsTree[] = $c;
+    }
+}
+
+require_once '../models/CommentReaction.php';
+$commentReactionModel = new CommentReaction();
+
 ?>
 <?php include 'header.php'; ?>
 
@@ -170,8 +184,12 @@ $comments = $commentController->getAllByPost($id, true);
                             Aucun commentaire pour le moment. Soyez le premier !
                         </p>
                     <?php else: ?>
-                        <?php foreach ($comments as $c): ?>
-                            <div class="comment-item mb-3 p-3">
+                        <?php
+                        $renderComment = function($c, $isReply = false) use ($id, $commentReactionModel, $comment_errors, $comment_values) {
+                            $userCReaction = isset($_SESSION['user_id']) ? $commentReactionModel->getUserReaction($c['id_comment'], $_SESSION['user_id']) : null;
+                            $marginLeft = $isReply ? 'margin-left: 40px; border-left: 3px solid #ccc;' : 'border-left: 3px solid #f28123;';
+                        ?>
+                            <div class="comment-item mb-3 p-3" style="<?= $marginLeft ?>">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <strong class="orange-text">
@@ -190,11 +208,52 @@ $comments = $commentController->getAllByPost($id, true);
                                         </a>
                                     <?php endif; ?>
                                 </div>
-                                <p class="mt-2 mb-0" style="white-space:pre-wrap;">
-                                    <?= htmlspecialchars($c['contenu']) ?>
-                                </p>
+                                <p class="mt-2 mb-2" style="white-space:pre-wrap;"><?= htmlspecialchars($c['contenu']) ?></p>
+                                
+                                <!-- Comment Reactions & Reply Button -->
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="comment-reactions d-flex gap-2">
+                                        <button class="btn btn-sm <?= $userCReaction === 'like' ? 'btn-success' : 'btn-outline-success' ?> react-comment-btn" data-type="like" data-comment="<?= $c['id_comment'] ?>" style="padding: 0.1rem 0.4rem; font-size: 12px;">
+                                            <i class="fas fa-thumbs-up"></i> <span class="like-c-count"><?= (int)$c['nb_likes'] ?></span>
+                                        </button>
+                                        <button class="btn btn-sm <?= $userCReaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?> react-comment-btn" data-type="dislike" data-comment="<?= $c['id_comment'] ?>" style="padding: 0.1rem 0.4rem; font-size: 12px;">
+                                            <i class="fas fa-thumbs-down"></i> <span class="dislike-c-count"><?= (int)$c['nb_dislikes'] ?></span>
+                                        </button>
+                                    </div>
+                                    <?php if (!$isReply && isset($_SESSION['user_id'])): ?>
+                                        <button class="btn btn-sm btn-link text-muted reply-btn" data-comment="<?= $c['id_comment'] ?>" style="font-size: 13px; text-decoration: none;">
+                                            <i class="fas fa-reply"></i> Répondre
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Reply Form (Hidden by default) -->
+                                <?php if (!$isReply && isset($_SESSION['user_id'])): ?>
+                                    <div class="reply-form-container mt-2" id="reply-form-<?= $c['id_comment'] ?>" style="display: none;">
+                                        <form method="POST" action="post_detail.php?id=<?= $id ?>" novalidate>
+                                            <input type="hidden" name="parent_id" value="<?= $c['id_comment'] ?>">
+                                            <div class="d-flex gap-2">
+                                                <input type="text" name="contenu" class="form-control form-control-sm" placeholder="Votre réponse..." required minlength="2" maxlength="1000">
+                                                <button type="submit" name="add_comment" class="btn btn-sm btn-primary">Envoyer</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        <?php endforeach; ?>
+                        <?php
+                        };
+
+                        foreach ($commentsTree as $parentComment): 
+                            $renderComment($parentComment, false);
+                            if (!empty($replies[$parentComment['id_comment']])):
+                                echo '<div class="replies-container">';
+                                foreach ($replies[$parentComment['id_comment']] as $reply):
+                                    $renderComment($reply, true);
+                                endforeach;
+                                echo '</div>';
+                            endif;
+                        endforeach; 
+                        ?>
                     <?php endif; ?>
 
                     <!-- ── Add Comment Form ── -->
@@ -364,6 +423,50 @@ document.querySelectorAll('.react-btn').forEach(btn => {
 
                 btnLike.className = 'btn react-btn ' + (data.user_reaction === 'like' ? 'btn-success' : 'btn-outline-success');
                 btnDislike.className = 'btn react-btn ' + (data.user_reaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger');
+            } else {
+                if (data.error === 'Vous devez être connecté.') {
+                    window.location.href = 'auth.php';
+                } else {
+                    alert(data.error);
+                }
+            }
+        })
+        .catch(err => console.error('Error:', err));
+    });
+});
+
+// Toggle Reply Form
+document.querySelectorAll('.reply-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment');
+        const form = document.getElementById('reply-form-' + commentId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+});
+
+// Comments Reactions AJAX
+document.querySelectorAll('.react-comment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.getAttribute('data-type');
+        const commentId = this.getAttribute('data-comment');
+        const parentDiv = this.closest('.comment-reactions');
+
+        fetch('comment_reaction.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ comment_id: commentId, type: type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                parentDiv.querySelector('.like-c-count').textContent = data.counts.likes;
+                parentDiv.querySelector('.dislike-c-count').textContent = data.counts.dislikes;
+
+                const btnLike = parentDiv.querySelector('.react-comment-btn[data-type="like"]');
+                const btnDislike = parentDiv.querySelector('.react-comment-btn[data-type="dislike"]');
+
+                btnLike.className = 'btn btn-sm react-comment-btn ' + (data.user_reaction === 'like' ? 'btn-success' : 'btn-outline-success');
+                btnDislike.className = 'btn btn-sm react-comment-btn ' + (data.user_reaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger');
             } else {
                 if (data.error === 'Vous devez être connecté.') {
                     window.location.href = 'auth.php';
