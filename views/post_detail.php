@@ -22,6 +22,12 @@ if (!$post || $post['statut'] !== 'publie') {
 $reactionCounts = $reactionModel->getCounts($id);
 $userReaction = isset($_SESSION['user_id']) ? $reactionModel->getUserReaction($id, $_SESSION['user_id']) : null;
 
+require_once '../models/Bookmark.php';
+$bookmarkModel = new Bookmark();
+$isBookmarked = isset($_SESSION['user_id']) ? $bookmarkModel->isBookmarked($id, $_SESSION['user_id']) : false;
+
+require_once '../models/User.php';
+
 // ─── Handle new comment submission ───────────────────────────────────────────
 $comment_errors = [];
 $comment_values = ['contenu' => ''];
@@ -120,6 +126,12 @@ $commentReactionModel = new CommentReaction();
                         <span class="text-muted small">
                             <i class="fas fa-user"></i>
                             <?= htmlspecialchars($post['auteur_nom'] ?? 'Anonyme') ?>
+                            <?php 
+                            if (isset($post['auteur_points'])) {
+                                $badge = User::getBadge($post['auteur_points']);
+                                echo "<span class='badge badge-{$badge['couleur']}' title='{$badge['nom']}'>{$badge['icone']} {$badge['nom']}</span>";
+                            }
+                            ?>
                         </span>
                         <span class="text-muted small">
                             <i class="fas fa-calendar"></i>
@@ -149,6 +161,18 @@ $commentReactionModel = new CommentReaction();
                         <button class="btn <?= $userReaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?> react-btn" data-type="dislike" data-post="<?= $id ?>">
                             <i class="fas fa-thumbs-down"></i> <span class="dislike-count"><?= $reactionCounts['dislikes'] ?></span>
                         </button>
+                        
+                        <!-- Bookmark -->
+                        <button class="btn <?= $isBookmarked ? 'btn-warning' : 'btn-outline-warning' ?> ms-auto" id="bookmarkBtn" data-post="<?= $id ?>">
+                            <i class="<?= $isBookmarked ? 'fas' : 'far' ?> fa-bookmark"></i> <span id="bookmarkText"><?= $isBookmarked ? 'Sauvegardé' : 'Sauvegarder' ?></span>
+                        </button>
+                        
+                        <!-- Report Post -->
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <button class="btn btn-outline-secondary report-btn" data-type="post" data-id="<?= $id ?>" title="Signaler ce post">
+                                <i class="fas fa-flag"></i>
+                            </button>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Owner actions -->
@@ -196,6 +220,12 @@ $commentReactionModel = new CommentReaction();
                                             <i class="fas fa-user-circle"></i>
                                             <?= htmlspecialchars($c['auteur_nom'] ?? 'Anonyme') ?>
                                         </strong>
+                                        <?php 
+                                        if (isset($c['auteur_points'])) {
+                                            $cBadge = User::getBadge($c['auteur_points']);
+                                            echo "<span class='badge badge-{$cBadge['couleur']} ms-1' title='{$cBadge['nom']}' style='font-size:0.7em;'>{$cBadge['icone']} {$cBadge['nom']}</span>";
+                                        }
+                                        ?>
                                         <small class="text-muted ml-2">
                                             <?= date('d/m/Y à H:i', strtotime($c['date_creation'])) ?>
                                         </small>
@@ -208,7 +238,7 @@ $commentReactionModel = new CommentReaction();
                                         </a>
                                     <?php endif; ?>
                                 </div>
-                                <p class="mt-2 mb-2" style="white-space:pre-wrap;"><?= htmlspecialchars($c['contenu']) ?></p>
+                                <p class="mt-2 mb-2" id="comment-text-<?= $c['id_comment'] ?>" style="white-space:pre-wrap;"><?= htmlspecialchars($c['contenu']) ?></p>
                                 
                                 <!-- Comment Reactions & Reply Button -->
                                 <div class="d-flex align-items-center gap-3">
@@ -223,6 +253,18 @@ $commentReactionModel = new CommentReaction();
                                     <?php if (!$isReply && isset($_SESSION['user_id'])): ?>
                                         <button class="btn btn-sm btn-link text-muted reply-btn" data-comment="<?= $c['id_comment'] ?>" style="font-size: 13px; text-decoration: none;">
                                             <i class="fas fa-reply"></i> Répondre
+                                        </button>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Translate Button -->
+                                    <button class="btn btn-sm btn-link text-muted translate-btn" data-comment="<?= $c['id_comment'] ?>" style="font-size: 13px; text-decoration: none;">
+                                        <i class="fas fa-language"></i> Traduire
+                                    </button>
+
+                                    <!-- Report Comment -->
+                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $c['user_id']): ?>
+                                        <button class="btn btn-sm text-muted report-btn ms-auto" data-type="comment" data-id="<?= $c['id_comment'] ?>" title="Signaler" style="padding: 0; font-size: 13px;">
+                                            <i class="fas fa-flag"></i>
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -478,6 +520,139 @@ document.querySelectorAll('.react-comment-btn').forEach(btn => {
         .catch(err => console.error('Error:', err));
     });
 });
+
+// Bookmark AJAX
+document.getElementById('bookmarkBtn')?.addEventListener('click', function() {
+    const postId = this.getAttribute('data-post');
+    const btn = this;
+    const icon = btn.querySelector('i');
+    const text = btn.querySelector('span');
+
+    fetch('bookmark_action.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (data.status === 'added') {
+                btn.classList.remove('btn-outline-warning');
+                btn.classList.add('btn-warning');
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                text.textContent = 'Sauvegardé';
+            } else {
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-outline-warning');
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                text.textContent = 'Sauvegarder';
+            }
+        } else {
+            if (data.error === 'Vous devez être connecté pour sauvegarder un article.') {
+                window.location.href = 'auth.php';
+            } else {
+                alert(data.error);
+            }
+        }
+    })
+    .catch(err => console.error('Error:', err));
+});
+
+// Report Modal Handling
+document.querySelectorAll('.report-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.getAttribute('data-type');
+        const id = this.getAttribute('data-id');
+        
+        document.getElementById('reportItemType').value = type;
+        document.getElementById('reportItemId').value = id;
+        document.getElementById('reportMotif').value = '';
+        document.getElementById('reportError').classList.add('d-none');
+        document.getElementById('reportSuccess').classList.add('d-none');
+        
+        // Show modal (assuming bootstrap 4 is included)
+        $('#reportModal').modal('show');
+    });
+});
+
+document.getElementById('submitReportBtn')?.addEventListener('click', function() {
+    const type = document.getElementById('reportItemType').value;
+    const id = document.getElementById('reportItemId').value;
+    const motif = document.getElementById('reportMotif').value;
+    const errorDiv = document.getElementById('reportError');
+    const successDiv = document.getElementById('reportSuccess');
+
+    if (!motif) {
+        errorDiv.textContent = 'Veuillez sélectionner un motif.';
+        errorDiv.classList.remove('d-none');
+        return;
+    }
+
+    fetch('report_action.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_type: type, item_id: id, motif: motif })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            errorDiv.classList.add('d-none');
+            successDiv.textContent = data.message;
+            successDiv.classList.remove('d-none');
+            setTimeout(() => {
+                $('#reportModal').modal('hide');
+            }, 2000);
+        } else {
+            successDiv.classList.add('d-none');
+            errorDiv.textContent = data.error;
+            errorDiv.classList.remove('d-none');
+        }
+    })
+    .catch(err => console.error('Error:', err));
+});
+
+// IA Translation using Google Translate unofficial API
+document.querySelectorAll('.translate-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment');
+        const textElement = document.getElementById('comment-text-' + commentId);
+        
+        // Prevent multiple translations
+        if (this.classList.contains('translated')) return;
+        
+        const originalText = textElement.textContent;
+        const targetLang = navigator.language.split('-')[0] || 'fr'; // auto detect user browser lang
+        
+        // Show loading state
+        const originalIcon = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
+        
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(originalText)}`;
+        
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data[0]) {
+                let translatedText = '';
+                data[0].forEach(t => { translatedText += t[0]; });
+                
+                textElement.innerHTML = `<span class="translated-text">${translatedText}</span><br><small class="text-muted"><i class="fas fa-magic"></i> Traduit automatiquement (Original: ${data[2]})</small>`;
+                this.classList.add('translated');
+                this.innerHTML = '<i class="fas fa-check text-success"></i> Traduit';
+            } else {
+                this.innerHTML = originalIcon;
+                alert("Erreur lors de la traduction.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            this.innerHTML = originalIcon;
+            alert("Erreur lors de la traduction.");
+        });
+    });
+});
 </script>
 
 <?php
@@ -486,4 +661,42 @@ function getCatBadge($cat) {
     return $map[$cat] ?? 'secondary';
 }
 ?>
+<!-- ── Report Modal ── -->
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel"><i class="fas fa-flag text-danger"></i> Signaler un contenu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="reportForm">
+            <input type="hidden" id="reportItemType" name="item_type" value="">
+            <input type="hidden" id="reportItemId" name="item_id" value="">
+            
+            <div class="form-group">
+                <label>Pourquoi signalez-vous ce contenu ?</label>
+                <select class="form-control" id="reportMotif" required>
+                    <option value="">Sélectionnez un motif...</option>
+                    <option value="Spam ou publicité">Spam ou publicité</option>
+                    <option value="Contenu offensant ou haineux">Contenu offensant ou haineux</option>
+                    <option value="Désinformation médicale/nutritionnelle">Désinformation médicale/nutritionnelle</option>
+                    <option value="Harcèlement">Harcèlement</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+            <div class="alert alert-danger d-none" id="reportError"></div>
+            <div class="alert alert-success d-none" id="reportSuccess"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" id="submitReportBtn">Envoyer le signalement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php include 'footer.php'; ?>

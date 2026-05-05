@@ -43,6 +43,29 @@ class CommentReactionController {
         $result = $this->reactionModel->toggleReaction($comment_id, $user_id, $type);
 
         if ($result) {
+            // Gamification logic
+            require_once __DIR__ . '/../models/Comment.php';
+            require_once __DIR__ . '/../models/User.php';
+            $commentModel = new Comment();
+            $userModel = new User();
+            $comment = $commentModel->getById($comment_id);
+            
+            if ($comment && $comment['user_id'] != $user_id) { // Don't award points for self-likes
+                $pointsToAdd = 0;
+                if ($result['status'] === 'added' && $type === 'like') {
+                    $pointsToAdd = 2;
+                } elseif ($result['status'] === 'removed' && $result['old_type'] === 'like') {
+                    $pointsToAdd = -2;
+                } elseif ($result['status'] === 'changed') {
+                    if ($type === 'like') $pointsToAdd = 2;
+                    if ($type === 'dislike') $pointsToAdd = -2;
+                }
+                
+                if ($pointsToAdd !== 0) {
+                    $userModel->addPoints($comment['user_id'], $pointsToAdd);
+                }
+            }
+
             $counts = $this->reactionModel->getCounts($comment_id);
             $user_reaction = $this->reactionModel->getUserReaction($comment_id, $user_id);
             echo json_encode([

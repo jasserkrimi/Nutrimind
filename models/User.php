@@ -15,6 +15,7 @@ class User {
     public $poids;
     public $taille;
     public $allergique;
+    public $points;
 
     public function __construct($db = null) {
         if ($db) {
@@ -236,6 +237,31 @@ class User {
         $stmt->bindParam(':id', $id);
 
         return $stmt->execute();
+    }
+
+    /**
+     * Add points to user
+     */
+    public function addPoints($user_id, $amount) {
+        $query = "UPDATE " . $this->table . " SET points = points + :amount WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':amount', $amount, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    /**
+     * Get user badge based on points
+     */
+    public static function getBadge($points) {
+        $points = (int)$points;
+        if ($points >= 200) {
+            return ['nom' => 'Expert', 'icone' => '🥇', 'couleur' => 'warning'];
+        } elseif ($points >= 50) {
+            return ['nom' => 'Actif', 'icone' => '🥈', 'couleur' => 'info'];
+        } else {
+            return ['nom' => 'Débutant', 'icone' => '🥉', 'couleur' => 'secondary'];
+        }
     }
 }
 ?>

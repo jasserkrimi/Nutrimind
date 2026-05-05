@@ -43,6 +43,29 @@ class ReactionController {
         $result = $this->reactionModel->toggleReaction($post_id, $user_id, $type);
 
         if ($result) {
+            // Gamification logic
+            require_once __DIR__ . '/../models/Post.php';
+            require_once __DIR__ . '/../models/User.php';
+            $postModel = new Post();
+            $userModel = new User();
+            $post = $postModel->getById($post_id);
+            
+            if ($post && $post['user_id'] != $user_id) { // Don't award points for self-likes
+                $pointsToAdd = 0;
+                if ($result['status'] === 'added' && $type === 'like') {
+                    $pointsToAdd = 2;
+                } elseif ($result['status'] === 'removed' && $result['old_type'] === 'like') {
+                    $pointsToAdd = -2;
+                } elseif ($result['status'] === 'changed') {
+                    if ($type === 'like') $pointsToAdd = 2; // changed from dislike to like
+                    if ($type === 'dislike') $pointsToAdd = -2; // changed from like to dislike
+                }
+                
+                if ($pointsToAdd !== 0) {
+                    $userModel->addPoints($post['user_id'], $pointsToAdd);
+                }
+            }
+
             $counts = $this->reactionModel->getCounts($post_id);
             $user_reaction = $this->reactionModel->getUserReaction($post_id, $user_id);
             echo json_encode([

@@ -54,7 +54,7 @@ class Post {
      * Get post by ID with author info and comment count
      */
     public function getById($id) {
-        $query = "SELECT p.*, u.nom AS auteur_nom, u.email AS auteur_email,
+        $query = "SELECT p.*, u.nom AS auteur_nom, u.email AS auteur_email, u.points AS auteur_points,
                          (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.id_post AND c.statut = 'approuve') AS nb_comments
                   FROM " . $this->table . " p
                   LEFT JOIN user u ON p.user_id = u.id
@@ -69,7 +69,7 @@ class Post {
      * Get all published posts with author info and comment count
      */
     public function getAllPublished($search = '', $categorie = '') {
-        $query = "SELECT p.*, u.nom AS auteur_nom,
+        $query = "SELECT p.*, u.nom AS auteur_nom, u.points AS auteur_points,
                          (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.id_post AND c.statut = 'approuve') AS nb_comments,
                          (SELECT COUNT(*) FROM post_reaction r WHERE r.post_id = p.id_post AND r.type = 'like') AS nb_likes,
                          (SELECT COUNT(*) FROM post_reaction r WHERE r.post_id = p.id_post AND r.type = 'dislike') AS nb_dislikes

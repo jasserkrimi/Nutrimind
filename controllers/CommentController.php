@@ -58,6 +58,11 @@ class CommentController {
 
         if (empty($errors)) {
             if ($this->comment->create()) {
+                // Gamification: Add 5 points for commenting
+                require_once __DIR__ . '/../models/User.php';
+                $userModel = new User();
+                $userModel->addPoints($user_id, 5);
+
                 return ['success' => true, 'errors' => [], 'id' => $this->comment->id_comment];
             }
             return ['success' => false, 'errors' => ['general' => 'Erreur lors de l\'ajout du commentaire.']];

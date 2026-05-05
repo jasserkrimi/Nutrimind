@@ -47,7 +47,7 @@ class Comment {
      * Get comment by ID with author and post info
      */
     public function getById($id) {
-        $query = "SELECT c.*, u.nom AS auteur_nom, u.email AS auteur_email,
+        $query = "SELECT c.*, u.nom AS auteur_nom, u.email AS auteur_email, u.points AS auteur_points,
                          p.titre AS post_titre
                   FROM " . $this->table . " c
                   LEFT JOIN user u ON c.user_id = u.id
@@ -63,7 +63,7 @@ class Comment {
      * Get all approved comments for a given post (with author info)
      */
     public function getAllByPost($post_id, $only_approved = true) {
-        $query = "SELECT c.*, u.nom AS auteur_nom,
+        $query = "SELECT c.*, u.nom AS auteur_nom, u.points AS auteur_points,
                          (SELECT COUNT(*) FROM comment_reaction cr WHERE cr.comment_id = c.id_comment AND cr.type = 'like') AS nb_likes,
                          (SELECT COUNT(*) FROM comment_reaction cr WHERE cr.comment_id = c.id_comment AND cr.type = 'dislike') AS nb_dislikes
                   FROM " . $this->table . " c

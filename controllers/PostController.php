@@ -155,6 +155,11 @@ class PostController {
 
         if (empty($errors)) {
             if ($this->post->create()) {
+                // Gamification: Add 10 points for creating a post
+                require_once __DIR__ . '/../models/User.php';
+                $userModel = new User();
+                $userModel->addPoints($user_id, 10);
+                
                 return ['success' => true, 'errors' => [], 'id' => $this->post->id_post];
             }
             return ['success' => false, 'errors' => ['general' => 'Erreur lors de la création du post.']];

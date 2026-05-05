@@ -23,13 +23,15 @@ class PostReaction {
                 // User clicked the same reaction, remove it
                 $stmtDel = $this->conn->prepare("DELETE FROM {$this->table} WHERE id_reaction = :id");
                 $stmtDel->bindParam(':id', $existing['id_reaction']);
-                return $stmtDel->execute();
+                $stmtDel->execute();
+                return ['status' => 'removed', 'old_type' => $existing['type']];
             } else {
                 // Change reaction
                 $stmtUp = $this->conn->prepare("UPDATE {$this->table} SET type = :type, date_creation = NOW() WHERE id_reaction = :id");
                 $stmtUp->bindParam(':type', $type);
                 $stmtUp->bindParam(':id', $existing['id_reaction']);
-                return $stmtUp->execute();
+                $stmtUp->execute();
+                return ['status' => 'changed', 'old_type' => $existing['type']];
             }
         } else {
             // New reaction
@@ -37,7 +39,8 @@ class PostReaction {
             $stmtIns->bindParam(':post_id', $post_id);
             $stmtIns->bindParam(':user_id', $user_id);
             $stmtIns->bindParam(':type', $type);
-            return $stmtIns->execute();
+            $stmtIns->execute();
+            return ['status' => 'added', 'old_type' => null];
         }
     }
 
