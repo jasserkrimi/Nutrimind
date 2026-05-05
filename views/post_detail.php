@@ -113,6 +113,11 @@ $comments = $commentController->getAllByPost($id, true);
 
                     <!-- Content -->
                     <div class="post-body mb-4" style="line-height:1.8; font-size:16px;">
+                        <?php if (!empty($post['image_url'])): ?>
+                            <div class="mb-4 text-center">
+                                <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="Image du post" class="img-fluid rounded shadow-sm" style="max-height: 500px; width: auto; object-fit: cover;">
+                            </div>
+                        <?php endif; ?>
                         <?= nl2br(htmlspecialchars($post['contenu'])) ?>
                     </div>
 

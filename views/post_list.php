@@ -139,6 +139,12 @@ $categories = \Post::getCategories();
                 <?php foreach ($posts as $post): ?>
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="single-latest-news h-100 post-card">
+                            <!-- Image preview -->
+                            <?php if (!empty($post['image_url'])): ?>
+                                <a href="post_detail.php?id=<?= $post['id_post'] ?>">
+                                    <div class="latest-news-bg" style="background-image: url('<?= htmlspecialchars($post['image_url']) ?>'); height: 200px; background-size: cover; background-position: center; border-radius: 8px 8px 0 0;"></div>
+                                </a>
+                            <?php endif; ?>
                             <!-- Category badge -->
                             <div class="news-text-box p-4">
                                 <span class="badge badge-<?= getCatBadge($post['categorie']) ?> mb-2">
