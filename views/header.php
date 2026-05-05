@@ -357,3 +357,4 @@
 		const styleSheet = document.createElement('style');
 		styleSheet.textContent = logoutModalStyles;
 		document.head.appendChild(styleSheet);
+	</script>
