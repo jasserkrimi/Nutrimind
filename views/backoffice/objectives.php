@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Check if user is admin
@@ -194,8 +194,13 @@ if (isset($_GET['delete'])) {
             class="nav-text">Objectifs</span></a></li>
 
             <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+        <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activites Sportives</span></a></li>
+        <li class="px-4 py-2"><small class="nav-text">Posts</small></li>
+        <li><a class="nav-link" href="post_list.php"><i class="ti ti-news"></i><span class="nav-text">Manage Posts</span></a></li>
+        <li><a class="nav-link" href="post_create.php"><i class="ti ti-plus"></i><span class="nav-text">Create Post</span></a></li>
+        <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message-2"></i><span class="nav-text">Comments</span></a></li>
       <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span
-            class="nav-text">Activit�s Sportives</span></a></li>
+            class="nav-text">Activit�s Sportives</span></a></li>
 
       <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
       <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
