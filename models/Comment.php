@@ -79,7 +79,7 @@ class Comment {
     /**
      * Get ALL comments (admin) with post title and author info
      */
-    public function getAll($statut_filter = '') {
+    public function getAll($statut_filter = '', $post_id_filter = null) {
         $query = "SELECT c.*, u.nom AS auteur_nom, u.email AS auteur_email,
                          p.titre AS post_titre
                   FROM " . $this->table . " c
@@ -91,6 +91,10 @@ class Comment {
         if (!empty($statut_filter)) {
             $query .= " AND c.statut = :statut";
             $params[':statut'] = $statut_filter;
+        }
+        if (!empty($post_id_filter)) {
+            $query .= " AND c.post_id = :post_id";
+            $params[':post_id'] = $post_id_filter;
         }
         $query .= " ORDER BY c.date_creation DESC";
 

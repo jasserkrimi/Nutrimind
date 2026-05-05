@@ -9,8 +9,11 @@ require_once '../../controllers/CommentController.php';
 $commentController = new CommentController();
 
 // ─── Filters ─────────────────────────────────────────────────────────────────
-$statut_filter = isset($_GET['statut']) ? trim($_GET['statut']) : '';
-$comments      = $commentController->getAll($statut_filter);
+$statut_filter  = isset($_GET['statut']) ? trim($_GET['statut']) : '';
+$post_id_filter = isset($_GET['post_id']) ? (int)$_GET['post_id'] : null;
+$comments       = $commentController->getAll($statut_filter, $post_id_filter);
+$post_query_param = $post_id_filter ? '&post_id=' . $post_id_filter : '';
+$post_query_param_first = $post_id_filter ? '?post_id=' . $post_id_filter : '';
 
 // ─── Delete handler ───────────────────────────────────────────────────────────
 if (isset($_GET['delete'])) {
@@ -141,16 +144,16 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
     <!-- Filter tabs -->
     <div class="mb-3">
       <div class="btn-group" role="group">
-        <a href="comment_list.php" class="btn btn-sm <?= !$statut_filter ? 'btn-dark' : 'btn-outline-secondary' ?>">
+        <a href="comment_list.php<?= $post_query_param_first ?>" class="btn btn-sm <?= !$statut_filter ? 'btn-dark' : 'btn-outline-secondary' ?>">
           Tous
         </a>
-        <a href="comment_list.php?statut=approuve" class="btn btn-sm <?= $statut_filter === 'approuve' ? 'btn-success' : 'btn-outline-success' ?>">
+        <a href="comment_list.php?statut=approuve<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'approuve' ? 'btn-success' : 'btn-outline-success' ?>">
           <i class="ti ti-check"></i> Approuvés
         </a>
-        <a href="comment_list.php?statut=en_attente" class="btn btn-sm <?= $statut_filter === 'en_attente' ? 'btn-warning' : 'btn-outline-warning' ?>">
+        <a href="comment_list.php?statut=en_attente<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'en_attente' ? 'btn-warning' : 'btn-outline-warning' ?>">
           <i class="ti ti-clock"></i> En attente
         </a>
-        <a href="comment_list.php?statut=rejete" class="btn btn-sm <?= $statut_filter === 'rejete' ? 'btn-danger' : 'btn-outline-danger' ?>">
+        <a href="comment_list.php?statut=rejete<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'rejete' ? 'btn-danger' : 'btn-outline-danger' ?>">
           <i class="ti ti-ban"></i> Rejetés
         </a>
       </div>

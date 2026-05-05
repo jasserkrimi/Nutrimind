@@ -205,9 +205,11 @@ if (isset($_GET['delete'])) {
                       </span>
                     </td>
                     <td class="text-center">
-                      <span class="badge bg-info-subtle text-info border border-info">
-                        <?= (int)$p['nb_comments'] ?>
-                      </span>
+                      <a href="comment_list.php?post_id=<?= $p['id_post'] ?>" title="Voir les commentaires">
+                        <span class="badge bg-info-subtle text-info border border-info">
+                          <?= (int)$p['nb_comments'] ?>
+                        </span>
+                      </a>
                     </td>
                     <td><small><?= date('d/m/Y', strtotime($p['date_creation'])) ?></small></td>
                     <td>

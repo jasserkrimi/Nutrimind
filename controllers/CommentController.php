@@ -15,8 +15,8 @@ class CommentController {
         return $this->comment->getAllByPost($post_id, $only_approved);
     }
 
-    public function getAll($statut_filter = '') {
-        return $this->comment->getAll($statut_filter);
+    public function getAll($statut_filter = '', $post_id_filter = null) {
+        return $this->comment->getAll($statut_filter, $post_id_filter);
     }
 
     public function getById($id) {
