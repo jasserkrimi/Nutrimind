@@ -82,7 +82,7 @@
 										<li><a href="ingredient_list.php">Ingrédients</a></li>
 									</ul>
 								</li>
-								<li><a href="post_list.php">Communauté</a></li>
+								<li><a href="post_list.php">Posts</a></li>
 								<li><a href="contact.html">Contact</a></li>
 								<li><a href="shop.html">Boutique</a>
 									<ul class="sub-menu">

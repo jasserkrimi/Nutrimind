@@ -84,7 +84,7 @@
 										<li><a href="ingredient_list.php">Ingredients</a></li>
 									</ul>
 								</li>
-								<li><a href="post_list.php">Communauté</a></li>
+								<li><a href="post_list.php">Posts</a></li>
 								<li><a href="objectif_list.php">Objectifs Nutrition</a></li><li><a href="../index.php">Module Sport</a></li><li><a href="../index.php?c=home&action=planning">Planning Sport</a></li>
 								<li><a href="shop.html">Shop</a>
 									<ul class="sub-menu">
