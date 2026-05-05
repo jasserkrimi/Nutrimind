@@ -6,6 +6,9 @@ require_once '../controllers/CommentController.php';
 $postController    = new PostController();
 $commentController = new CommentController();
 
+require_once '../models/PostReaction.php';
+$reactionModel = new PostReaction();
+
 // ─── Get post ────────────────────────────────────────────────────────────────
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $post = $postController->getById($id);
@@ -15,6 +18,9 @@ if (!$post || $post['statut'] !== 'publie') {
     header('Location: post_list.php');
     exit;
 }
+
+$reactionCounts = $reactionModel->getCounts($id);
+$userReaction = isset($_SESSION['user_id']) ? $reactionModel->getUserReaction($id, $_SESSION['user_id']) : null;
 
 // ─── Handle new comment submission ───────────────────────────────────────────
 $comment_errors = [];
@@ -119,6 +125,16 @@ $comments = $commentController->getAllByPost($id, true);
                             </div>
                         <?php endif; ?>
                         <?= nl2br(htmlspecialchars($post['contenu'])) ?>
+                    </div>
+
+                    <!-- ── Reactions ── -->
+                    <div class="reactions-container d-flex align-items-center mb-4 gap-2">
+                        <button class="btn <?= $userReaction === 'like' ? 'btn-success' : 'btn-outline-success' ?> react-btn" data-type="like" data-post="<?= $id ?>">
+                            <i class="fas fa-thumbs-up"></i> <span class="like-count"><?= $reactionCounts['likes'] ?></span>
+                        </button>
+                        <button class="btn <?= $userReaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger' ?> react-btn" data-type="dislike" data-post="<?= $id ?>">
+                            <i class="fas fa-thumbs-down"></i> <span class="dislike-count"><?= $reactionCounts['dislikes'] ?></span>
+                        </button>
                     </div>
 
                     <!-- Owner actions -->
@@ -322,6 +338,42 @@ document.getElementById('commentForm')?.addEventListener('submit', function(e) {
         textarea.classList.add('is-warning');
         textarea.classList.remove('is-invalid');
     }
+});
+
+// Reactions AJAX
+document.querySelectorAll('.react-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.getAttribute('data-type');
+        const postId = this.getAttribute('data-post');
+
+        fetch('post_reaction.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id: postId, type: type })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update counts
+                document.querySelector('.like-count').textContent = data.counts.likes;
+                document.querySelector('.dislike-count').textContent = data.counts.dislikes;
+
+                // Reset buttons
+                const btnLike = document.querySelector('.react-btn[data-type="like"]');
+                const btnDislike = document.querySelector('.react-btn[data-type="dislike"]');
+
+                btnLike.className = 'btn react-btn ' + (data.user_reaction === 'like' ? 'btn-success' : 'btn-outline-success');
+                btnDislike.className = 'btn react-btn ' + (data.user_reaction === 'dislike' ? 'btn-danger' : 'btn-outline-danger');
+            } else {
+                if (data.error === 'Vous devez être connecté.') {
+                    window.location.href = 'auth.php';
+                } else {
+                    alert(data.error);
+                }
+            }
+        })
+        .catch(err => console.error('Error:', err));
+    });
 });
 </script>
 

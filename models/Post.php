@@ -70,7 +70,9 @@ class Post {
      */
     public function getAllPublished($search = '', $categorie = '') {
         $query = "SELECT p.*, u.nom AS auteur_nom,
-                         (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.id_post AND c.statut = 'approuve') AS nb_comments
+                         (SELECT COUNT(*) FROM comment c WHERE c.post_id = p.id_post AND c.statut = 'approuve') AS nb_comments,
+                         (SELECT COUNT(*) FROM post_reaction r WHERE r.post_id = p.id_post AND r.type = 'like') AS nb_likes,
+                         (SELECT COUNT(*) FROM post_reaction r WHERE r.post_id = p.id_post AND r.type = 'dislike') AS nb_dislikes
                   FROM " . $this->table . " p
                   LEFT JOIN user u ON p.user_id = u.id
                   WHERE p.statut = 'publie'";

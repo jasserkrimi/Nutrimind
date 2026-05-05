@@ -170,11 +170,12 @@ $categories = \Post::getCategories();
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <a href="post_detail.php?id=<?= $post['id_post'] ?>" class="read-more-btn">
-                                        Lire la suite <i class="fas fa-angle-right"></i>
+                                        Lire plus <i class="fas fa-angle-right"></i>
                                     </a>
-                                    <span class="text-muted small">
-                                        <i class="fas fa-comments"></i>
-                                        <?= (int)$post['nb_comments'] ?> commentaire(s)
+                                    <span class="text-muted" style="font-size: 14px;">
+                                        <i class="fas fa-thumbs-up" style="color: #28a745;"></i> <?= (int)$post['nb_likes'] ?>
+                                        &nbsp;&nbsp;
+                                        <i class="fas fa-comments" style="color: #f28123;"></i> <?= (int)$post['nb_comments'] ?>
                                     </span>
                                 </div>
 
