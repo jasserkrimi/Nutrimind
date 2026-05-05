@@ -24,6 +24,14 @@ switch ($controller) {
         require_once 'controllers/SeanceController.php';
         $ctrl = new SeanceController();
         break;
+    case 'post':
+        require_once 'controllers/PostController.php';
+        $ctrl = new PostController();
+        break;
+    case 'comment':
+        require_once 'controllers/CommentController.php';
+        $ctrl = new CommentController();
+        break;
     default:
         die("Contrôleur introuvable.");
 }
