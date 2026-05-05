@@ -20,7 +20,7 @@ $errors     = [];
 $values     = $post; // prefill with existing
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $result = $postController->update($id, $_POST);
+    $result = $postController->update($id, $_POST, $_FILES['image_file'] ?? null);
     if ($result['success']) {
         $_SESSION['success_message'] = 'Post mis à jour avec succès !';
         header("Location: post_detail.php?id=$id"); exit;
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="post-form-card p-4">
                     <h4 class="mb-4"><i class="fas fa-edit orange-text"></i> Modifier le post</h4>
-                    <form method="POST" action="post_edit.php?id=<?= $id ?>" id="postEditForm" novalidate>
+                    <form method="POST" action="post_edit.php?id=<?= $id ?>" id="postEditForm" enctype="multipart/form-data" novalidate>
 
                         <!-- Titre -->
                         <div class="form-group">
@@ -95,14 +95,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <small class="form-text text-muted"><span id="contenuCount">0</span>/5000 caractères</small>
                         </div>
 
-                        <!-- Image URL -->
+                        <!-- Image Upload -->
                         <div class="form-group">
-                            <label for="image_url">Image URL <small class="text-muted">(optionnel)</small></label>
-                            <input type="url" name="image_url" id="image_url"
+                            <label for="image_file">Image <small class="text-muted">(optionnel)</small></label>
+                            <?php if (!empty($values['image_url'])): ?>
+                                <div class="mb-2">
+                                    <img src="<?= htmlspecialchars($values['image_url']) ?>" alt="Image actuelle" style="max-width: 200px; border-radius: 8px;">
+                                    <small class="d-block text-muted mt-1">Image actuelle (laissez vide pour la conserver)</small>
+                                </div>
+                            <?php endif; ?>
+                            <input type="file" name="image_file" id="image_file"
                                    class="form-control <?= isset($errors['image_url']) ? 'is-invalid' : '' ?>"
-                                   value="<?= htmlspecialchars($values['image_url'] ?? '') ?>" maxlength="500">
+                                   accept="image/jpeg, image/png, image/gif">
                             <?php if (isset($errors['image_url'])): ?>
-                                <div class="invalid-feedback"><?= htmlspecialchars($errors['image_url']) ?></div>
+                                <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['image_url']) ?></div>
                             <?php endif; ?>
                         </div>
 

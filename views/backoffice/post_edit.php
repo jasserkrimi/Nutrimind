@@ -17,7 +17,7 @@ $errors     = [];
 $values     = $post;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $result = $postController->update($id, $_POST);
+    $result = $postController->update($id, $_POST, $_FILES['image_file'] ?? null);
     if ($result['success']) {
         $_SESSION['success_message'] = 'Post mis à jour avec succès.';
         header('Location: post_list.php'); exit;
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="card">
       <div class="card-body p-4">
-        <form method="POST" action="post_edit.php?id=<?= $id ?>" id="adminEditForm" novalidate>
+        <form method="POST" action="post_edit.php?id=<?= $id ?>" id="adminEditForm" enctype="multipart/form-data" novalidate>
           <div class="row g-3">
 
             <!-- Catégorie + Statut -->
@@ -144,14 +144,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div class="form-text"><span id="contenuCount">0</span>/5000 caractères</div>
             </div>
 
-            <!-- Image URL -->
+            <!-- Image Upload -->
             <div class="col-12">
-              <label class="form-label fw-semibold">Image URL <small class="text-muted">(optionnel)</small></label>
-              <input type="url" name="image_url"
+              <label class="form-label fw-semibold">Image <small class="text-muted">(optionnel)</small></label>
+              <?php if (!empty($values['image_url'])): ?>
+                <div class="mb-2">
+                  <img src="../<?= htmlspecialchars($values['image_url']) ?>" alt="Image actuelle" style="max-height: 100px; border-radius: 4px;">
+                  <div class="form-text">Image actuelle (laissez vide pour conserver)</div>
+                </div>
+              <?php endif; ?>
+              <input type="file" name="image_file"
                      class="form-control <?= isset($errors['image_url']) ? 'is-invalid' : '' ?>"
-                     value="<?= htmlspecialchars($values['image_url'] ?? '') ?>" maxlength="500">
+                     accept="image/jpeg, image/png, image/gif">
               <?php if (isset($errors['image_url'])): ?>
-                <div class="invalid-feedback"><?= htmlspecialchars($errors['image_url']) ?></div>
+                <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['image_url']) ?></div>
               <?php endif; ?>
             </div>
 

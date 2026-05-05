@@ -29,7 +29,48 @@ class PostController {
 
     // ─── Create ──────────────────────────────────────────────────────────
 
-    public function create($data, $user_id) {
+    private function handleImageUpload($file) {
+        if (!isset($file['error']) || is_array($file['error'])) {
+            return ['success' => false, 'error' => 'Paramètres invalides.'];
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'error' => 'Erreur lors de l\'upload.'];
+        }
+        if ($file['size'] > 5000000) { // 5MB limit
+            return ['success' => false, 'error' => 'Le fichier dépasse la limite de 5 Mo.'];
+        }
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $ext = array_search(
+            $finfo->file($file['tmp_name']),
+            array(
+                'jpg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+            ),
+            true
+        );
+
+        if (false === $ext) {
+            return ['success' => false, 'error' => 'Format de fichier non autorisé (JPG, PNG, GIF).'];
+        }
+
+        $filename = sprintf('%s.%s', sha1_file($file['tmp_name']) . '_' . time(), $ext);
+        $upload_dir = __DIR__ . '/../views/assets/uploads/posts/';
+        
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        $filepath = $upload_dir . $filename;
+        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            return ['success' => false, 'error' => 'Erreur lors de la sauvegarde du fichier.'];
+        }
+
+        return ['success' => true, 'path' => 'assets/uploads/posts/' . $filename];
+    }
+
+    public function create($data, $user_id, $file = null) {
         $errors = [];
 
         // Validate user_id
@@ -98,13 +139,13 @@ class PostController {
                 ? $data['statut'] : 'brouillon';
         }
 
-        // image_url (optional)
-        if (!empty($data['image_url'])) {
-            $img = trim($data['image_url']);
-            if (strlen($img) > 500) {
-                $errors['image_url'] = "L'URL de l'image ne peut pas dépasser 500 caractères.";
+        // Image Upload
+        if ($file && isset($file['error']) && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = $this->handleImageUpload($file);
+            if (!$uploadResult['success']) {
+                $errors['image_url'] = $uploadResult['error'];
             } else {
-                $this->post->image_url = $img;
+                $this->post->image_url = $uploadResult['path'];
             }
         } else {
             $this->post->image_url = null;
@@ -123,7 +164,7 @@ class PostController {
 
     // ─── Update ──────────────────────────────────────────────────────────
 
-    public function update($id, $data) {
+    public function update($id, $data, $file = null) {
         $errors = [];
 
         if (empty($id) || !is_numeric($id) || $id <= 0) {
@@ -176,16 +217,16 @@ class PostController {
                 ? $data['statut'] : $existing['statut'];
         }
 
-        // image_url (optional)
-        if (!empty($data['image_url'])) {
-            $img = trim($data['image_url']);
-            if (strlen($img) > 500) {
-                $errors['image_url'] = "L'URL de l'image ne peut pas dépasser 500 caractères.";
+        // Image Upload
+        if ($file && isset($file['error']) && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = $this->handleImageUpload($file);
+            if (!$uploadResult['success']) {
+                $errors['image_url'] = $uploadResult['error'];
             } else {
-                $this->post->image_url = $img;
+                $this->post->image_url = $uploadResult['path'];
             }
         } else {
-            $this->post->image_url = null;
+            $this->post->image_url = $existing['image_url'];
         }
 
         $this->post->id_post = $id;

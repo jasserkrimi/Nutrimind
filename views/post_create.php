@@ -16,7 +16,7 @@ $statuts        = \Post::getStatuts();
 
 // ─── Handle form submission ───────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $result = $postController->create($_POST, $_SESSION['user_id']);
+    $result = $postController->create($_POST, $_SESSION['user_id'], $_FILES['image_file'] ?? null);
 
     if ($result['success']) {
         $_SESSION['success_message'] = 'Post créé avec succès !';
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="fas fa-edit orange-text"></i> Nouveau post
                     </h4>
 
-                    <form method="POST" action="post_create.php" id="postForm" novalidate>
+                    <form method="POST" action="post_create.php" id="postForm" enctype="multipart/form-data" novalidate>
 
                         <!-- Titre -->
                         <div class="form-group">
@@ -109,16 +109,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </small>
                         </div>
 
-                        <!-- Image URL (optional) -->
+                        <!-- Image Upload (optional) -->
                         <div class="form-group">
-                            <label for="image_url">Image URL <small class="text-muted">(optionnel)</small></label>
-                            <input type="url" name="image_url" id="image_url"
+                            <label for="image_file">Image <small class="text-muted">(optionnel)</small></label>
+                            <input type="file" name="image_file" id="image_file"
                                    class="form-control <?= isset($errors['image_url']) ? 'is-invalid' : '' ?>"
-                                   placeholder="https://exemple.com/image.jpg"
-                                   value="<?= htmlspecialchars($values['image_url']) ?>"
-                                   maxlength="500">
+                                   accept="image/jpeg, image/png, image/gif">
                             <?php if (isset($errors['image_url'])): ?>
-                                <div class="invalid-feedback"><?= htmlspecialchars($errors['image_url']) ?></div>
+                                <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['image_url']) ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -222,12 +220,22 @@ document.getElementById('categorie').addEventListener('change', function() {
     }
 });
 
-document.getElementById('image_url').addEventListener('input', function() {
-    const urlPattern = /^https?:\/\/.+/;
-    if (this.value && !urlPattern.test(this.value)) {
-        this.classList.add('is-warning');
-        this.classList.remove('is-invalid');
-        this.setCustomValidity('Veuillez entrer une URL valide commençant par http:// ou https://.');
+document.getElementById('image_file').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            this.classList.add('is-warning');
+            this.classList.remove('is-invalid');
+            this.setCustomValidity('Veuillez sélectionner une image valide (JPG, PNG, GIF).');
+        } else if (file.size > 5000000) {
+            this.classList.add('is-warning');
+            this.classList.remove('is-invalid');
+            this.setCustomValidity('L\'image ne doit pas dépasser 5 Mo.');
+        } else {
+            this.classList.remove('is-warning', 'is-invalid');
+            this.setCustomValidity('');
+        }
     } else {
         this.classList.remove('is-warning', 'is-invalid');
         this.setCustomValidity('');
@@ -259,12 +267,15 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
         valid = false;
     }
 
-    const imageUrl = document.getElementById('image_url');
-    const urlPattern = /^https?:\/\/.+/;
-    if (imageUrl.value && !urlPattern.test(imageUrl.value)) {
-        imageUrl.classList.add('is-warning');
-        imageUrl.classList.remove('is-invalid');
-        valid = false;
+    const imageFile = document.getElementById('image_file');
+    if (imageFile.files.length > 0) {
+        const file = imageFile.files[0];
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type) || file.size > 5000000) {
+            imageFile.classList.add('is-warning');
+            imageFile.classList.remove('is-invalid');
+            valid = false;
+        }
     }
 
     if (!valid) {

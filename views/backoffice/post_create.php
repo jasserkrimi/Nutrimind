@@ -18,7 +18,7 @@ $values = ['titre'=>'','contenu'=>'','categorie'=>'','image_url'=>'','statut'=>'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = (int)($_POST['user_id'] ?? $_SESSION['user_id']);
-    $result  = $postController->create($_POST, $user_id);
+    $result  = $postController->create($_POST, $user_id, $_FILES['image_file'] ?? null);
     if ($result['success']) {
         $_SESSION['success_message'] = 'Post créé avec succès.';
         header('Location: post_list.php'); exit;
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="card">
       <div class="card-body p-4">
-        <form method="POST" action="post_create.php" id="adminPostForm" novalidate>
+        <form method="POST" action="post_create.php" id="adminPostForm" enctype="multipart/form-data" novalidate>
           <div class="row g-3">
 
             <!-- Auteur (admin can choose) -->
@@ -155,15 +155,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div class="form-text"><span id="contenuCount">0</span>/5000 caractères</div>
             </div>
 
-            <!-- Image URL -->
+            <!-- Image Upload -->
             <div class="col-12">
-              <label class="form-label fw-semibold">Image URL <small class="text-muted">(optionnel)</small></label>
-              <input type="url" name="image_url"
+              <label class="form-label fw-semibold">Image <small class="text-muted">(optionnel)</small></label>
+              <input type="file" name="image_file"
                      class="form-control <?= isset($errors['image_url']) ? 'is-invalid' : '' ?>"
-                     placeholder="https://exemple.com/image.jpg"
-                     value="<?= htmlspecialchars($values['image_url'] ?? '') ?>" maxlength="500">
+                     accept="image/jpeg, image/png, image/gif">
               <?php if (isset($errors['image_url'])): ?>
-                <div class="invalid-feedback"><?= htmlspecialchars($errors['image_url']) ?></div>
+                <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['image_url']) ?></div>
               <?php endif; ?>
             </div>
 
