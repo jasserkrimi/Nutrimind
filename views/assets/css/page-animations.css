@@ -1,0 +1,106 @@
+/* ── Page Animations ─────────────────────────────────────────────── */
+
+/* Fade + slide up on load */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Section title */
+.section-title { animation: fadeUp .7s ease both; }
+
+/* Nav buttons row */
+.nav-anim { animation: fadeIn .6s ease .15s both; }
+
+/* Table wrapper */
+.table-anim { animation: fadeUp .65s ease .2s both; }
+
+/* Table rows — staggered */
+#objectivesTableBody tr,
+#plansTableBody tr {
+  animation: slideRight .45s ease both;
+  opacity: 0;
+}
+/* stagger via nth-child (up to 20 rows) */
+#objectivesTableBody tr:nth-child(1),  #plansTableBody tr:nth-child(1)  { animation-delay: .05s; }
+#objectivesTableBody tr:nth-child(2),  #plansTableBody tr:nth-child(2)  { animation-delay: .10s; }
+#objectivesTableBody tr:nth-child(3),  #plansTableBody tr:nth-child(3)  { animation-delay: .15s; }
+#objectivesTableBody tr:nth-child(4),  #plansTableBody tr:nth-child(4)  { animation-delay: .20s; }
+#objectivesTableBody tr:nth-child(5),  #plansTableBody tr:nth-child(5)  { animation-delay: .25s; }
+#objectivesTableBody tr:nth-child(6),  #plansTableBody tr:nth-child(6)  { animation-delay: .30s; }
+#objectivesTableBody tr:nth-child(7),  #plansTableBody tr:nth-child(7)  { animation-delay: .35s; }
+#objectivesTableBody tr:nth-child(8),  #plansTableBody tr:nth-child(8)  { animation-delay: .40s; }
+#objectivesTableBody tr:nth-child(9),  #plansTableBody tr:nth-child(9)  { animation-delay: .45s; }
+#objectivesTableBody tr:nth-child(10), #plansTableBody tr:nth-child(10) { animation-delay: .50s; }
+#objectivesTableBody tr:nth-child(n+11), #plansTableBody tr:nth-child(n+11) { animation-delay: .55s; }
+
+/* Stat cards */
+.stat-card-anim {
+  animation: scaleIn .55s ease both;
+  transition: transform .2s, box-shadow .2s;
+}
+.stat-card-anim:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+}
+.stat-card-anim:nth-child(1) { animation-delay: .1s; }
+.stat-card-anim:nth-child(2) { animation-delay: .2s; }
+.stat-card-anim:nth-child(3) { animation-delay: .3s; }
+.stat-card-anim:nth-child(4) { animation-delay: .4s; }
+.stat-card-anim:nth-child(5) { animation-delay: .5s; }
+
+/* Chart */
+.chart-anim { animation: scaleIn .8s ease .4s both; }
+
+/* Search input */
+.search-anim { animation: fadeUp .5s ease .1s both; }
+
+/* Buttons hover lift */
+.btn, .boxed-btn {
+  transition: transform .18s, box-shadow .18s !important;
+}
+.btn:hover, .boxed-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.15) !important;
+}
+
+/* Table row hover */
+#objectivesTable tbody tr,
+#plansTable tbody tr {
+  transition: background .18s, transform .15s;
+}
+#objectivesTable tbody tr:hover,
+#plansTable tbody tr:hover {
+  background: rgba(99,102,241,.06) !important;
+  transform: translateX(3px);
+}
+
+/* AI Report button pulse */
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,.5); }
+  50%      { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+}
+.ai-report-btn {
+  animation: pulse-border 2.2s ease-in-out infinite;
+}
+
+/* Page entrance overlay */
+.page-fade {
+  animation: fadeIn .5s ease both;
+}
