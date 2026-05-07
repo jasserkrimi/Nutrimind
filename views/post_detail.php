@@ -102,10 +102,7 @@ $commentReactionModel = new CommentReaction();
 
         <!-- Flash Messages -->
         <?php if (isset($_SESSION['success_message'])): ?>
-            <div class="alert alert-success alert-dismissible fade show">
-                <?= htmlspecialchars($_SESSION['success_message']); unset($_SESSION['success_message']); ?>
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-            </div>
+            <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
         <?php if (isset($_SESSION['error_message'])): ?>
             <div class="alert alert-danger alert-dismissible fade show">
@@ -231,11 +228,11 @@ $commentReactionModel = new CommentReaction();
                                         </small>
                                     </div>
                                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $c['user_id']): ?>
-                                        <a href="post_detail.php?id=<?= $id ?>&delete_comment=<?= $c['id_comment'] ?>"
-                                           class="btn btn-xs btn-outline-danger"
-                                           onclick="return confirm('Supprimer ce commentaire ?')">
+                                        <button class="btn btn-xs btn-outline-danger delete-comment-btn"
+                                            data-comment="<?= $c['id_comment'] ?>"
+                                            data-post="<?= $id ?>">
                                             <i class="fas fa-trash"></i>
-                                        </a>
+                                        </button>
                                     <?php endif; ?>
                                 </div>
                                 <p class="mt-2 mb-2" id="comment-text-<?= $c['id_comment'] ?>" style="white-space:pre-wrap;"><?= htmlspecialchars($c['contenu']) ?></p>
@@ -275,8 +272,22 @@ $commentReactionModel = new CommentReaction();
                                         <form method="POST" action="post_detail.php?id=<?= $id ?>" novalidate>
                                             <input type="hidden" name="parent_id" value="<?= $c['id_comment'] ?>">
                                             <div class="d-flex gap-2">
-                                                <input type="text" name="contenu" class="form-control form-control-sm" placeholder="Votre réponse..." required minlength="2" maxlength="1000">
+                                                <input type="text" name="contenu" id="reply-input-<?= $c['id_comment'] ?>" class="form-control form-control-sm" placeholder="Votre réponse..." required minlength="2" maxlength="1000">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary ai-suggest-btn" data-comment="<?= $c['id_comment'] ?>" data-text="<?= htmlspecialchars($c['contenu'], ENT_QUOTES) ?>" title="Suggestions IA">
+                                                    <i class="fas fa-magic"></i>
+                                                </button>
                                                 <button type="submit" name="add_comment" class="btn btn-sm btn-primary">Envoyer</button>
+                                            </div>
+                                            <!-- AI Suggestions Box -->
+                                            <div id="ai-suggestions-<?= $c['id_comment'] ?>" class="ai-suggestions-box" style="display:none;">
+                                                <div class="ai-suggestions-header">
+                                                    <i class="fas fa-magic"></i> Suggestions IA
+                                                    <span class="ai-suggestions-close" data-comment="<?= $c['id_comment'] ?>">&times;</span>
+                                                </div>
+                                                <div class="ai-suggestions-loading" id="ai-suggest-loading-<?= $c['id_comment'] ?>" style="display:none;">
+                                                    <i class="fas fa-spinner fa-spin"></i> Génération en cours...
+                                                </div>
+                                                <div class="ai-suggestions-list" id="ai-suggest-list-<?= $c['id_comment'] ?>"></div>
                                             </div>
                                         </form>
                                     </div>
@@ -315,6 +326,34 @@ $commentReactionModel = new CommentReaction();
                                 <small class="form-text text-muted">
                                     <span id="charCount">0</span>/1000 caractères
                                 </small>
+
+                                <!-- AI Comment Improver -->
+                                <div class="mt-2">
+                                    <button type="button" id="improveCommentBtn" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-magic"></i> Améliorer avec l'IA
+                                    </button>
+                                </div>
+                                <div id="improveBox" style="display:none;" class="improve-box mt-2">
+                                    <div class="improve-box-header">
+                                        <i class="fas fa-magic"></i> Version améliorée par l'IA
+                                        <span id="improveClose" style="cursor:pointer; float:right; font-size:18px; line-height:1;">&times;</span>
+                                    </div>
+                                    <div id="improveLoading" style="display:none; padding:10px 12px; color:#888; font-size:13px;">
+                                        <i class="fas fa-spinner fa-spin"></i> Amélioration en cours...
+                                    </div>
+                                    <div id="improveResult" style="display:none;">
+                                        <div id="improveText" class="improve-preview"></div>
+                                        <div class="improve-actions">
+                                            <button type="button" id="improveAccept" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Utiliser ce texte
+                                            </button>
+                                            <button type="button" id="improveReject" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-times"></i> Garder l'original
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="improveError" style="display:none; padding:8px 12px; color:#dc3545; font-size:13px;"></div>
+                                </div>
                             </div>
                             <?php if (isset($comment_errors['general'])): ?>
                                 <div class="alert alert-danger"><?= htmlspecialchars($comment_errors['general']) ?></div>
@@ -381,6 +420,25 @@ $commentReactionModel = new CommentReaction();
     </div>
 </div>
 
+<!-- Delete Comment Modal -->
+<div class="modal fade" id="deleteCommentModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Supprimer le commentaire</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimer ce commentaire ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <a href="#" id="confirmDeleteCommentBtn" class="btn btn-danger">Supprimer</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .post-detail-card { background:#fff; border:1px solid #eee; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
 .comment-item { background:#f9f9f9; border-left:3px solid #f28123; border-radius:4px; }
@@ -398,6 +456,84 @@ $commentReactionModel = new CommentReaction();
 .is-warning:focus {
     border-color: #ffc107 !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+}
+
+/* AI Smart Reply Suggestions */
+.ai-suggestions-box {
+    margin-top: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    overflow: hidden;
+    font-size: 13px;
+}
+.ai-suggestions-header {
+    background: linear-gradient(90deg, #f28123, #f5a623);
+    color: #fff;
+    padding: 6px 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ai-suggestions-close {
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0.85;
+}
+.ai-suggestions-close:hover { opacity: 1; }
+.ai-suggestions-loading {
+    padding: 10px 12px;
+    color: #888;
+}
+.ai-suggestions-list {
+    padding: 6px 8px;
+}
+.ai-suggestion-chip {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #f28123;
+    color: #333;
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin: 4px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-size: 12.5px;
+}
+.ai-suggestion-chip:hover {
+    background: #f28123;
+    color: #fff;
+}
+
+/* AI Comment Improver */
+.improve-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    overflow: hidden;
+    font-size: 13px;
+}
+.improve-box-header {
+    background: linear-gradient(90deg, #f28123, #f5a623);
+    color: #fff;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+.improve-preview {
+    padding: 10px 12px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    color: #333;
+}
+.improve-actions {
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
 }
 </style>
 
@@ -430,6 +566,98 @@ const delBtn = document.getElementById('deletePostBtn');
 if (delBtn) {
     delBtn.addEventListener('click', e => { e.preventDefault(); $('#deletePostModal').modal('show'); });
 }
+
+// ── AI Comment Improver ───────────────────────────────────────────────────────
+(function() {
+    const improveBtn    = document.getElementById('improveCommentBtn');
+    const improveBox    = document.getElementById('improveBox');
+    const improveClose  = document.getElementById('improveClose');
+    const improveLoad   = document.getElementById('improveLoading');
+    const improveResult = document.getElementById('improveResult');
+    const improveText   = document.getElementById('improveText');
+    const improveError  = document.getElementById('improveError');
+    const improveAccept = document.getElementById('improveAccept');
+    const improveReject = document.getElementById('improveReject');
+    const ta            = document.getElementById('contenu');
+
+    if (!improveBtn || !ta) return;
+
+    function resetBox() {
+        improveLoad.style.display   = 'none';
+        improveResult.style.display = 'none';
+        improveError.style.display  = 'none';
+    }
+
+    improveBtn.addEventListener('click', function() {
+        const draft = ta.value.trim();
+
+        if (draft.length < 2) {
+            ta.focus();
+            ta.classList.add('is-warning');
+            return;
+        }
+
+        // Toggle off if already open
+        if (improveBox.style.display === 'block') {
+            improveBox.style.display = 'none';
+            return;
+        }
+
+        improveBox.style.display = 'block';
+        resetBox();
+        improveLoad.style.display = 'block';
+
+        fetch('improve_comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ draft: draft })
+        })
+        .then(r => r.json())
+        .then(data => {
+            improveLoad.style.display = 'none';
+            if (!data.success) {
+                improveError.textContent    = data.error || 'Erreur IA.';
+                improveError.style.display  = 'block';
+                return;
+            }
+            improveText.textContent         = data.improved;
+            improveResult.style.display     = 'block';
+        })
+        .catch(() => {
+            improveLoad.style.display  = 'none';
+            improveError.textContent   = 'Service IA indisponible.';
+            improveError.style.display = 'block';
+        });
+    });
+
+    // Accept: replace textarea content with improved version
+    improveAccept.addEventListener('click', function() {
+        ta.value = improveText.textContent;
+        ta.dispatchEvent(new Event('input')); // update char counter
+        improveBox.style.display = 'none';
+    });
+
+    // Reject: just close the box
+    improveReject.addEventListener('click', function() {
+        improveBox.style.display = 'none';
+    });
+
+    // Close button
+    improveClose.addEventListener('click', function() {
+        improveBox.style.display = 'none';
+    });
+})();
+
+// Delete comment buttons
+document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment');
+        const postId    = this.getAttribute('data-post');
+        document.getElementById('confirmDeleteCommentBtn').href =
+            'post_detail.php?id=' + postId + '&delete_comment=' + commentId;
+        $('#deleteCommentModal').modal('show');
+    });
+});
 
 // Client-side comment validation
 document.getElementById('commentForm')?.addEventListener('submit', function(e) {
@@ -483,6 +711,65 @@ document.querySelectorAll('.reply-btn').forEach(btn => {
         const commentId = this.getAttribute('data-comment');
         const form = document.getElementById('reply-form-' + commentId);
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+});
+
+// ── AI Smart Reply Suggestions ────────────────────────────────────────────────
+document.querySelectorAll('.ai-suggest-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId   = this.getAttribute('data-comment');
+        const commentText = this.getAttribute('data-text');
+        const box         = document.getElementById('ai-suggestions-' + commentId);
+        const loading     = document.getElementById('ai-suggest-loading-' + commentId);
+        const list        = document.getElementById('ai-suggest-list-' + commentId);
+
+        // Toggle: if already open, close it
+        if (box.style.display === 'block') {
+            box.style.display = 'none';
+            return;
+        }
+
+        box.style.display  = 'block';
+        loading.style.display = 'block';
+        list.innerHTML     = '';
+
+        fetch('reply_suggestions.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ comment: commentText })
+        })
+        .then(r => r.json())
+        .then(data => {
+            loading.style.display = 'none';
+            if (!data.success) {
+                list.innerHTML = '<span class="text-muted" style="padding:8px;display:block;">' + (data.error || 'Erreur IA.') + '</span>';
+                return;
+            }
+            data.suggestions.forEach(suggestion => {
+                const chip = document.createElement('span');
+                chip.className   = 'ai-suggestion-chip';
+                chip.textContent = suggestion;
+                chip.addEventListener('click', function() {
+                    const input = document.getElementById('reply-input-' + commentId);
+                    input.value = suggestion;
+                    input.focus();
+                    box.style.display = 'none';
+                });
+                list.appendChild(chip);
+            });
+        })
+        .catch(() => {
+            loading.style.display = 'none';
+            list.innerHTML = '<span class="text-muted" style="padding:8px;display:block;">Service IA indisponible.</span>';
+        });
+    });
+});
+
+// Close AI suggestions box
+document.querySelectorAll('.ai-suggestions-close').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment');
+        document.getElementById('ai-suggestions-' + commentId).style.display = 'none';
     });
 });
 
