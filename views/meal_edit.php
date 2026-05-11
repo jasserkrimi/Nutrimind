@@ -40,6 +40,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <?php include 'header.php'; ?>
 
+<!-- ── Floating food particles ── -->
+<div class="food-particles" id="foodParticles" aria-hidden="true"></div>
+<script>
+(function(){
+    var e=['🥗','🍎','🥦','🍋','🥕','🍇','🥑','🍓','🌽','🥝','🍊','🫐'];
+    var c=document.getElementById('foodParticles');
+    for(var i=0;i<20;i++){
+        var s=document.createElement('span');
+        s.textContent=e[i%e.length];
+        s.style.left=(Math.random()*100)+'%';
+        s.style.fontSize=(16+Math.random()*20)+'px';
+        s.style.animationDuration=(12+Math.random()*20)+'s';
+        s.style.animationDelay=(Math.random()*16)+'s';
+        c.appendChild(s);
+    }
+}());
+</script>
+
 	<!-- edit meal section -->
 	<div class="product-section mt-150 mb-150">
 		<div class="container">
@@ -112,9 +130,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 							$selectedIngredients = isset($_POST['ingredients']) ? $_POST['ingredients'] : array_column($mealData['ingredients'], 'id');
 							$quantities = isset($_POST['quantities']) ? $_POST['quantities'] : array_column($mealData['ingredients'], 'quantity', 'id');
 							?>
-							<div class="row">
+
+							<!-- Live search for ingredients -->
+							<div class="mb-3">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text bg-white">
+											<i class="fas fa-search text-muted"></i>
+										</span>
+									</div>
+									<input type="text" id="ingredientSearch"
+										class="form-control"
+										placeholder="Rechercher un ingrédient…"
+										autocomplete="off">
+								</div>
+								<small id="ingredientSearchCount" class="form-text text-muted mt-1"></small>
+							</div>
+
+							<div class="row" id="ingredientsGrid">
 								<?php foreach ($ingredients as $ingredient): ?>
-									<div class="col-md-6 mb-3">
+									<div class="col-md-6 mb-3 ingredient-card-wrap"
+									     data-name="<?php echo strtolower(htmlspecialchars($ingredient['name'])); ?>">
 										<div class="card p-3">
 											<div class="form-check">
 												<input class="form-check-input" type="checkbox" 
@@ -141,6 +177,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 									</div>
 								<?php endforeach; ?>
 							</div>
+
+							<!-- No results message -->
+							<div id="ingredientNoResults" class="text-center py-3 d-none">
+								<i class="fas fa-search text-muted mr-2"></i>
+								<span class="text-muted">Aucun ingrédient trouvé pour "<strong id="ingredientSearchTerm"></strong>"</span>
+							</div>
 						</div>
 
 						<div class="form-group mt-5">
@@ -153,5 +195,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 	</div>
 	<!-- end edit meal section -->
+
+<script>
+	// ── Live ingredient search ────────────────────────────────────────────
+	const ingredientSearch     = document.getElementById('ingredientSearch');
+	const ingredientCards      = document.querySelectorAll('.ingredient-card-wrap');
+	const ingredientNoResults  = document.getElementById('ingredientNoResults');
+	const ingredientSearchTerm = document.getElementById('ingredientSearchTerm');
+	const ingredientSearchCount = document.getElementById('ingredientSearchCount');
+	const totalIngredients     = ingredientCards.length;
+
+	function filterIngredients() {
+		const term    = ingredientSearch.value.trim().toLowerCase();
+		let   visible = 0;
+
+		ingredientCards.forEach(function (card) {
+			const name = card.getAttribute('data-name');
+			if (!term || name.includes(term)) {
+				card.style.display = '';
+				visible++;
+			} else {
+				card.style.display = 'none';
+			}
+		});
+
+		// Update count text
+		if (term) {
+			ingredientSearchCount.textContent =
+				visible + ' ingrédient' + (visible !== 1 ? 's' : '') +
+				' trouvé' + (visible !== 1 ? 's' : '') +
+				' sur ' + totalIngredients;
+		} else {
+			ingredientSearchCount.textContent = '';
+		}
+
+		// Show / hide no-results message
+		if (visible === 0 && term) {
+			ingredientSearchTerm.textContent = term;
+			ingredientNoResults.classList.remove('d-none');
+		} else {
+			ingredientNoResults.classList.add('d-none');
+		}
+	}
+
+	ingredientSearch.addEventListener('input', filterIngredients);
+
+	// Clear search with Escape key
+	ingredientSearch.addEventListener('keydown', function (e) {
+		if (e.key === 'Escape') {
+			ingredientSearch.value = '';
+			filterIngredients();
+			ingredientSearch.blur();
+		}
+	});
+</script>
+
+<style>
+/* ── Animated gradient background ── */
+body { background:linear-gradient(-45deg,#e8f5e9,#e3f2fd,#e0f7fa,#f1f8e9,#e8f5e9); background-size:400% 400%; animation:bgShift 16s ease infinite; }
+@keyframes bgShift { 0%{background-position:0% 50%;} 25%{background-position:100% 50%;} 50%{background-position:100% 0%;} 75%{background-position:0% 100%;} 100%{background-position:0% 50%;} }
+/* ── Floating particles ── */
+.food-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.food-particles span { position:absolute; bottom:-60px; opacity:0; animation:floatUp linear infinite; user-select:none; }
+@keyframes floatUp { 0%{transform:translateY(0) rotate(0deg);opacity:0;} 10%{opacity:.45;} 90%{opacity:.25;} 100%{transform:translateY(-110vh) rotate(360deg);opacity:0;} }
+/* ── Buttons lift + glow ── */
+.boxed-btn { transition:transform .25s,box-shadow .25s !important; }
+.boxed-btn:hover { transform:translateY(-3px) !important; box-shadow:0 8px 20px rgba(242,129,35,.35) !important; }
+/* ── Section title fade-in ── */
+.section-title { animation:titleFadeIn .6s ease both; }
+@keyframes titleFadeIn { from{opacity:0;transform:translateY(-16px);} to{opacity:1;transform:translateY(0);} }
+/* ── Cards lift ── */
+.card { transition:transform .25s,box-shadow .25s; }
+.card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.12); }
+/* ── Form inputs focus glow ── */
+.form-control:focus, .form-select:focus { border-color:#26a69a !important; box-shadow:0 0 0 3px rgba(38,166,154,.18) !important; outline:none; }
+</style>
 
 <?php include 'footer.php'; ?>
