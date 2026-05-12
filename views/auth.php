@@ -284,7 +284,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                                     </div>
                                     <div class="hr"></div>
                                     <div class="foot">
-                                        <a href="#">Mot de passe oublié?</a>
+                                        <a href="forgot_password_token.php">Mot de passe oublié?</a>
                                     </div>
                                 </form>
                             </div>
