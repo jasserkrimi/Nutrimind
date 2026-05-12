@@ -6,7 +6,7 @@
  */
 
 return [
-    'api_key' => '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',
+    'api_key' => 'YOUR_GROQ_API_KEY_HERE',
     'model' => 'llama-3.3-70b-versatile',
     'api_url' => 'https://api.groq.com/openai/v1/chat/completions'
 ];
