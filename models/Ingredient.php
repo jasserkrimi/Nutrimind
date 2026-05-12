@@ -31,6 +31,27 @@ class Ingredient
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Get paginated ingredients — returns one page of results
+    public function getPaginated($limit, $offset)
+    {
+        $query = "SELECT * FROM " . $this->table . " ORDER BY name ASC LIMIT :limit OFFSET :offset";
+        $stmt  = $this->conn->prepare($query);
+        $stmt->bindValue(':limit',  (int) $limit,  PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Count total ingredients — used to calculate total pages
+    public function countAll()
+    {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        $stmt  = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $row['total'];
+    }
+
     // Get ingredient by ID
     public function getById($id)
     {

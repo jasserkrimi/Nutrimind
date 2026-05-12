@@ -15,7 +15,7 @@
 
 header('Content-Type: application/json');
 
-define('HF_TOKEN',    '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');
+define('HF_TOKEN',    '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');
 define('HF_ENDPOINT', 'https://router.huggingface.co/hf-inference/models/nateraw/food');
 
 // ── Map nateraw/food labels → Edamam-friendly search terms ───────────────────

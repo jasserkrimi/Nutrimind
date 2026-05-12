@@ -20,6 +20,31 @@ class MealController
         return $this->meal->getAll();
     }
 
+    // Get paginated meals with pagination metadata
+    // Returns: ['meals' => [...], 'totalItems' => N, 'totalPages' => N, 'currentPage' => N, 'perPage' => N]
+    public function getPaginated($page = 1, $perPage = 5)
+    {
+        $page      = max(1, (int) $page);
+        $perPage   = max(1, (int) $perPage);
+        $offset    = ($page - 1) * $perPage;
+        $totalItems = $this->meal->countAll();
+        $totalPages = (int) ceil($totalItems / $perPage);
+
+        // Clamp current page to valid range
+        if ($page > $totalPages && $totalPages > 0) {
+            $page   = $totalPages;
+            $offset = ($page - 1) * $perPage;
+        }
+
+        return [
+            'meals'       => $this->meal->getPaginated($perPage, $offset),
+            'totalItems'  => $totalItems,
+            'totalPages'  => $totalPages,
+            'currentPage' => $page,
+            'perPage'     => $perPage,
+        ];
+    }
+
     // Get meal by ID with ingredients
     public function getById($id)
     {
