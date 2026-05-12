@@ -5,11 +5,65 @@ class AIEmailGenerator {
     private $apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
     private $model = 'llama-3.3-70b-versatile'; // Updated to latest model
 
-    public function __construct() {
-        // Load API key from environment variable or config file
-        $this->apiKey = getenv('GROQ_API_KEY') ?: '';
+    public function __construct($apiKey = null) {
+        // Load API key from parameter, environment variable, or config file
+        if ($apiKey) {
+            $this->apiKey = $apiKey;
+        } else {
+            // Try environment variable first
+            $this->apiKey = getenv('GROQ_API_KEY');
+            
+            // If not found, try loading from .env file
+            if (empty($this->apiKey)) {
+                $this->loadEnvFile();
+                $this->apiKey = getenv('GROQ_API_KEY');
+            }
+            
+            // If still not found, check for config file
+            if (empty($this->apiKey)) {
+                $configFile = __DIR__ . '/groq_config.php';
+                if (file_exists($configFile)) {
+                    $config = require $configFile;
+                    $this->apiKey = $config['api_key'] ?? '';
+                }
+            }
+        }
+        
         if (empty($this->apiKey)) {
-            throw new Exception('GROQ_API_KEY environment variable is not set');
+            throw new Exception('GROQ_API_KEY not configured. Please set it in environment variable, .env file, or groq_config.php');
+        }
+    }
+    
+    /**
+     * Load environment variables from .env file
+     */
+    private function loadEnvFile() {
+        $envFile = __DIR__ . '/.env';
+        if (!file_exists($envFile)) {
+            return;
+        }
+        
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            // Skip comments
+            if (strpos(trim($line), '#') === 0) {
+                continue;
+            }
+            
+            // Parse KEY=VALUE
+            if (strpos($line, '=') !== false) {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                
+                // Remove quotes if present
+                $value = trim($value, '"\'');
+                
+                // Set environment variable
+                putenv("$key=$value");
+                $_ENV[$key] = $value;
+                $_SERVER[$key] = $value;
+            }
         }
     }
 
