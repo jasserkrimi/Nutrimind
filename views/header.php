@@ -33,6 +33,48 @@
 
 </head>
 <body>
+
+<!-- ── Animated gradient background ── -->
+<style>
+body {
+    background: linear-gradient(-45deg,#e8f5e9,#e3f2fd,#e0f7fa,#f1f8e9,#e8f5e9) !important;
+    background-size: 400% 400% !important;
+    animation: bgShift 16s ease infinite !important;
+}
+@keyframes bgShift {
+    0%   { background-position: 0%   50%; }
+    25%  { background-position: 100% 50%; }
+    50%  { background-position: 100% 0%;  }
+    75%  { background-position: 0%   100%;}
+    100% { background-position: 0%   50%; }
+}
+.food-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.food-particles span { position:absolute; bottom:-60px; opacity:0; animation:floatUp linear infinite; user-select:none; }
+@keyframes floatUp {
+    0%   { transform:translateY(0) rotate(0deg);       opacity:0;  }
+    10%  { opacity:.4; }
+    90%  { opacity:.2; }
+    100% { transform:translateY(-110vh) rotate(360deg); opacity:0; }
+}
+</style>
+
+<!-- ── Floating food particles ── -->
+<div class="food-particles" id="foodParticles" aria-hidden="true"></div>
+<script>
+(function(){
+    var e=['🥗','🍎','🥦','🍋','🥕','🍇','🥑','🍓','🌽','🥝','🍊','🫐'];
+    var c=document.getElementById('foodParticles');
+    for(var i=0;i<20;i++){
+        var s=document.createElement('span');
+        s.textContent=e[i%e.length];
+        s.style.left=(Math.random()*100)+'%';
+        s.style.fontSize=(16+Math.random()*20)+'px';
+        s.style.animationDuration=(12+Math.random()*20)+'s';
+        s.style.animationDelay=(Math.random()*16)+'s';
+        c.appendChild(s);
+    }
+}());
+</script>
 	
 	<!--PreLoader-->
     <div class="loader">

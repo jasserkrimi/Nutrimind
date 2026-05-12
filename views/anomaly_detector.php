@@ -14,19 +14,20 @@ try {
     $db   = new Database();
     $conn = $db->connect();
 
+    // Use LEFT JOIN so meals without ingredients are still included
     $stmt = $conn->prepare("
         SELECT
             m.id AS meal_id,
             m.name AS meal_name,
             m.date AS meal_date,
-            ROUND(SUM(i.calories * mi.quantity / 100), 1) AS total_calories,
-            ROUND(SUM(i.proteins * mi.quantity / 100), 1) AS total_proteins,
-            ROUND(SUM(i.lipides  * mi.quantity / 100), 1) AS total_fat,
-            ROUND(SUM(i.glucides * mi.quantity / 100), 1) AS total_carbs
+            ROUND(COALESCE(SUM(i.calories * mi.quantity / 100), 0), 1) AS total_calories,
+            ROUND(COALESCE(SUM(i.proteins * mi.quantity / 100), 0), 1) AS total_proteins,
+            ROUND(COALESCE(SUM(i.lipides  * mi.quantity / 100), 0), 1) AS total_fat,
+            ROUND(COALESCE(SUM(i.glucides * mi.quantity / 100), 0), 1) AS total_carbs,
+            COUNT(mi.ingredient_id) AS ingredient_count
         FROM Meal m
-        INNER JOIN Meal_Ingredient mi ON mi.meal_id = m.id
-        INNER JOIN Ingredient i ON i.id = mi.ingredient_id
-        WHERE m.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        LEFT JOIN Meal_Ingredient mi ON mi.meal_id = m.id
+        LEFT JOIN Ingredient i ON i.id = mi.ingredient_id
         GROUP BY m.id, m.name, m.date
         ORDER BY m.date DESC
     ");
@@ -34,12 +35,12 @@ try {
     $mealNutrition = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $THRESH = [
-        'cal_high'  => 900,
-        'cal_low'   => 150,
-        'fat_high'  => 35,
-        'prot_low'  => 5,
-        'carb_high' => 100,
-        'carb_low'  => 10,
+        'cal_high'  => 700,   // > 700 kcal = high
+        'cal_low'   => 200,   // < 200 kcal = too light
+        'fat_high'  => 25,    // > 25g fat = high
+        'prot_low'  => 10,    // < 10g protein = low
+        'carb_high' => 80,    // > 80g carbs = high
+        'carb_low'  => 15,    // < 15g carbs = very low
     ];
 
     $issues = [
@@ -61,14 +62,15 @@ try {
         $carbs = (float) $m['total_carbs'];
         $label = htmlspecialchars($m['meal_name']) . ' (' . htmlspecialchars($m['meal_date']) . ')';
 
-        if ($cal  > $THRESH['cal_high'])               $issues['cal_high']['meals'][]  = ['label'=>$label, 'val'=>"{$cal} kcal"];
-        if ($fat  > $THRESH['fat_high'])               $issues['fat_high']['meals'][]  = ['label'=>$label, 'val'=>"{$fat}g"];
-        if ($carbs > $THRESH['carb_high'])             $issues['carb_high']['meals'][] = ['label'=>$label, 'val'=>"{$carbs}g"];
-        if ($prot < $THRESH['prot_low'] && $cal > 50)  $issues['prot_low']['meals'][]  = ['label'=>$label, 'val'=>"{$prot}g prot."];
-        if ($cal  < $THRESH['cal_low']  && $cal > 0)   $issues['cal_low']['meals'][]   = ['label'=>$label, 'val'=>"{$cal} kcal"];
-        if ($carbs < $THRESH['carb_low'] && $cal > 100) $issues['carb_low']['meals'][] = ['label'=>$label, 'val'=>"{$carbs}g"];
+        if ($cal  > $THRESH['cal_high'])                $issues['cal_high']['meals'][]  = ['label'=>$label, 'val'=>"{$cal} kcal"];
+        if ($fat  > $THRESH['fat_high'])                $issues['fat_high']['meals'][]  = ['label'=>$label, 'val'=>"{$fat}g"];
+        if ($carbs > $THRESH['carb_high'])              $issues['carb_high']['meals'][] = ['label'=>$label, 'val'=>"{$carbs}g"];
+        if ($prot < $THRESH['prot_low'] && $cal > 100)  $issues['prot_low']['meals'][]  = ['label'=>$label, 'val'=>"{$prot}g prot."];
+        if ($cal  < $THRESH['cal_low']  && $cal > 0)    $issues['cal_low']['meals'][]   = ['label'=>$label, 'val'=>"{$cal} kcal"];
+        if ($carbs < $THRESH['carb_low'] && $cal > 150) $issues['carb_low']['meals'][]  = ['label'=>$label, 'val'=>"{$carbs}g"];
 
-        if ($cal>=300 && $cal<=700 && $prot>=15 && $fat<=25 && $carbs>=20 && $carbs<=80)
+        // Balanced: reasonable calories, decent protein, not too much fat or carbs
+        if ($cal >= 200 && $cal <= 700 && $prot >= 10 && $fat <= 25 && $carbs >= 15 && $carbs <= 80)
             $issues['balanced']['meals'][] = ['label'=>$label, 'val'=>"{$cal} kcal"];
     }
 
@@ -126,7 +128,7 @@ try {
         <div class="col-lg-8 offset-lg-2 text-center">
             <div class="section-title">
                 <h3><span class="orange-text">Détecteur</span> d'Anomalies Nutritionnelles</h3>
-                <p>Analyse automatique des 30 derniers jours — alertes groupées par type de problème.</p>
+                <p>Analyse automatique de tous vos repas — alertes groupées par type de problème.</p>
             </div>
         </div>
     </div>

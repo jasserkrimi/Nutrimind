@@ -36,6 +36,24 @@ $priorityCfg = [
 <?php include 'header.php'; ?>
 <link rel="stylesheet" href="assets/css/nutrimind-ui.css">
 
+<!-- ── Floating food particles ── -->
+<div class="food-particles" id="foodParticles" aria-hidden="true"></div>
+<script>
+(function(){
+    var e=['🥗','🍎','🥦','🍋','🥕','🍇','🥑','🍓','🌽','🥝','🍊','🫐'];
+    var c=document.getElementById('foodParticles');
+    for(var i=0;i<20;i++){
+        var s=document.createElement('span');
+        s.textContent=e[i%e.length];
+        s.style.left=(Math.random()*100)+'%';
+        s.style.fontSize=(16+Math.random()*20)+'px';
+        s.style.animationDuration=(12+Math.random()*20)+'s';
+        s.style.animationDelay=(Math.random()*16)+'s';
+        c.appendChild(s);
+    }
+}());
+</script>
+
 <div class="nm-page">
 
   <!-- Hero -->

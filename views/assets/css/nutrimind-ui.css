@@ -450,3 +450,89 @@
   .nm-card-body { padding: 1rem; }
   .nm-toolbar { padding: .9rem 1rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   NutriMind — Repas-style Animations (applied to all planning pages)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 1. Animated gradient background */
+body {
+    background: linear-gradient(-45deg,#e8f5e9,#e3f2fd,#e0f7fa,#f1f8e9,#e8f5e9) !important;
+    background-size: 400% 400% !important;
+    animation: bgShift 16s ease infinite !important;
+}
+@keyframes bgShift {
+    0%   { background-position: 0%   50%; }
+    25%  { background-position: 100% 50%; }
+    50%  { background-position: 100% 0%;  }
+    75%  { background-position: 0%   100%;}
+    100% { background-position: 0%   50%; }
+}
+
+/* 2. Floating food particles */
+.food-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.food-particles span { position:absolute; bottom:-60px; opacity:0; animation:floatUp linear infinite; user-select:none; }
+@keyframes floatUp {
+    0%   { transform:translateY(0) rotate(0deg);       opacity:0;   }
+    10%  { opacity:.45; }
+    90%  { opacity:.25; }
+    100% { transform:translateY(-110vh) rotate(360deg); opacity:0;   }
+}
+
+/* 3. Button lift + glow */
+.nm-btn { transition: transform .25s, box-shadow .25s !important; }
+.nm-btn:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(224,123,57,.35) !important; }
+
+/* 4. Card lift on hover */
+.nm-card { transition: transform .25s, box-shadow .25s !important; }
+.nm-card:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 28px rgba(0,0,0,.12) !important; }
+
+/* 5. Table row stagger fade-in + hover lift */
+.nm-table tbody tr {
+    animation: rowFadeIn .45s ease both;
+    transition: background .2s, transform .2s, box-shadow .2s;
+}
+.nm-table tbody tr:hover {
+    background: rgba(232,245,233,.85) !important;
+    transform: translateX(4px);
+    box-shadow: inset 4px 0 0 #26a69a;
+}
+@keyframes rowFadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0);    }
+}
+.nm-table tbody tr:nth-child(1)  { animation-delay:.05s; }
+.nm-table tbody tr:nth-child(2)  { animation-delay:.10s; }
+.nm-table tbody tr:nth-child(3)  { animation-delay:.15s; }
+.nm-table tbody tr:nth-child(4)  { animation-delay:.20s; }
+.nm-table tbody tr:nth-child(5)  { animation-delay:.25s; }
+.nm-table tbody tr:nth-child(6)  { animation-delay:.30s; }
+.nm-table tbody tr:nth-child(7)  { animation-delay:.35s; }
+.nm-table tbody tr:nth-child(8)  { animation-delay:.40s; }
+.nm-table tbody tr:nth-child(9)  { animation-delay:.45s; }
+.nm-table tbody tr:nth-child(10) { animation-delay:.50s; }
+
+/* 6. Section title fade-in */
+.nm-hero { animation: titleFadeIn .6s ease both; }
+@keyframes titleFadeIn {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0);     }
+}
+
+/* 7. Stat cards pop-in */
+.nm-stat-card { animation: statPopIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes statPopIn {
+    from { opacity:0; transform:scale(.85); }
+    to   { opacity:1; transform:scale(1);   }
+}
+.nm-anim-stat:nth-child(1) .nm-stat-card { animation-delay:.05s; }
+.nm-anim-stat:nth-child(2) .nm-stat-card { animation-delay:.15s; }
+.nm-anim-stat:nth-child(3) .nm-stat-card { animation-delay:.25s; }
+.nm-anim-stat:nth-child(4) .nm-stat-card { animation-delay:.35s; }
+
+/* 8. Input focus glow */
+.nm-search input:focus {
+    border-color: #26a69a !important;
+    box-shadow: 0 0 0 3px rgba(38,166,154,.18) !important;
+    outline: none;
+}
