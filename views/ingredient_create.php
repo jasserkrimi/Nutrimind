@@ -19,6 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <?php include 'header.php'; ?>
 
+<!-- ── Floating food particles ── -->
+<div class="food-particles" id="foodParticles" aria-hidden="true"></div>
+<script>
+(function(){
+    var e=['🥗','🍎','🥦','🍋','🥕','🍇','🥑','🍓','🌽','🥝','🍊','🫐'];
+    var c=document.getElementById('foodParticles');
+    for(var i=0;i<20;i++){
+        var s=document.createElement('span');
+        s.textContent=e[i%e.length];
+        s.style.left=(Math.random()*100)+'%';
+        s.style.fontSize=(16+Math.random()*20)+'px';
+        s.style.animationDuration=(12+Math.random()*20)+'s';
+        s.style.animationDelay=(Math.random()*16)+'s';
+        c.appendChild(s);
+    }
+}());
+</script>
+
 	<!-- create ingredient section -->
 	<div class="product-section mt-150 mb-150">
 		<div class="container">
@@ -115,5 +133,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 	</div>
 	<!-- end create ingredient section -->
+
+<style>
+/* ── Animated gradient background ── */
+body {
+    background: linear-gradient(-45deg,#e8f5e9,#e3f2fd,#e0f7fa,#f1f8e9,#e8f5e9);
+    background-size: 400% 400%;
+    animation: bgShift 16s ease infinite;
+}
+@keyframes bgShift {
+    0%  { background-position: 0%   50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 100% 0%;  }
+    75% { background-position: 0%   100%;}
+    100%{ background-position: 0%   50%; }
+}
+/* ── Floating food particles ── */
+.food-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.food-particles span { position:absolute; bottom:-60px; opacity:0; animation:floatUp linear infinite; user-select:none; }
+@keyframes floatUp {
+    0%  { transform:translateY(0) rotate(0deg);    opacity:0;   }
+    10% { opacity:.45; }
+    90% { opacity:.25; }
+    100%{ transform:translateY(-110vh) rotate(360deg); opacity:0; }
+}
+/* ── Table glass card ── */
+.table-responsive {
+    background: rgba(255,255,255,.82);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    padding: 4px;
+    transition: box-shadow .3s;
+}
+.table-responsive:hover { box-shadow: 0 8px 32px rgba(38,166,154,.18); }
+/* ── Buttons lift + glow ── */
+.boxed-btn { transition: transform .25s, box-shadow .25s !important; }
+.boxed-btn:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(242,129,35,.35) !important; }
+/* ── Section title fade-in ── */
+.section-title { animation: titleFadeIn .6s ease both; }
+@keyframes titleFadeIn {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0);     }
+}
+/* ── Card lift on hover ── */
+.card { transition: transform .25s, box-shadow .25s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+/* ── Form inputs focus glow ── */
+.form-control:focus, .form-select:focus {
+    border-color: #26a69a !important;
+    box-shadow: 0 0 0 3px rgba(38,166,154,.18) !important;
+    outline: none;
+}
+</style>
 
 <?php include 'footer.php'; ?>

@@ -1,0 +1,10 @@
+﻿# Fichiers de configuration avec clés API
+config/.env.local
+config/api_keys.php
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

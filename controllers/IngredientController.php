@@ -17,6 +17,31 @@ class IngredientController
         return $this->ingredient->getAll();
     }
 
+    // Get paginated ingredients with pagination metadata
+    // Returns: ['ingredients' => [...], 'totalItems' => N, 'totalPages' => N, 'currentPage' => N, 'perPage' => N]
+    public function getPaginated($page = 1, $perPage = 5)
+    {
+        $page      = max(1, (int) $page);
+        $perPage   = max(1, (int) $perPage);
+        $offset    = ($page - 1) * $perPage;
+        $totalItems = $this->ingredient->countAll();
+        $totalPages = (int) ceil($totalItems / $perPage);
+
+        // Clamp current page to valid range
+        if ($page > $totalPages && $totalPages > 0) {
+            $page   = $totalPages;
+            $offset = ($page - 1) * $perPage;
+        }
+
+        return [
+            'ingredients' => $this->ingredient->getPaginated($perPage, $offset),
+            'totalItems'  => $totalItems,
+            'totalPages'  => $totalPages,
+            'currentPage' => $page,
+            'perPage'     => $perPage,
+        ];
+    }
+
     // Get ingredient by ID
     public function getById($id)
     {
