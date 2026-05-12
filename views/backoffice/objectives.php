@@ -354,6 +354,11 @@ if (isset($_GET['delete'])) {
               </tbody>
             </table>
           </div>
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <div id="objPaginationInfo" class="text-muted small"></div>
+            <nav><ul class="pagination pagination-sm mb-0" id="objPagination"></ul></nav>
+          </div>
         </div>
       </div>
 
@@ -398,33 +403,81 @@ if (isset($_GET['delete'])) {
       }
     });
 
-    // Dynamic search functionality
+    // ── Pagination + Search for objectives ──────────────────────────────
     const searchInput = document.getElementById('objectivesSearchInput');
-    const tableBody = document.getElementById('objectivesTableBody');
-    const tableRows = tableBody.getElementsByTagName('tr');
+    const tableBody   = document.getElementById('objectivesTableBody');
+    const pagination  = document.getElementById('objPagination');
+    const pageInfo    = document.getElementById('objPaginationInfo');
+    const PER_PAGE    = 10;
+    let currentPage   = 1;
 
-    searchInput.addEventListener('keyup', function() {
-      const searchTerm = this.value.toLowerCase();
-      for (let i = 0; i < tableRows.length; i++) {
-        const row = tableRows[i];
-        const cells = row.getElementsByTagName('td');
-        let found = false;
-        for (let j = 0; j < cells.length; j++) {
-          if (cells[j].textContent.toLowerCase().includes(searchTerm)) {
-            found = true;
-            break;
-          }
-        }
-        row.style.display = found ? '' : 'none';
+    // All rows (never removed from DOM)
+    const allRows = Array.from(tableBody.querySelectorAll('tr'));
+
+    function getFilteredRows() {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) return allRows;
+      return allRows.filter(row =>
+        Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(q))
+      );
+    }
+
+    function render() {
+      const filtered   = getFilteredRows();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * PER_PAGE;
+      const end   = start + PER_PAGE;
+
+      // Show/hide rows
+      allRows.forEach(row => row.style.display = 'none');
+      filtered.slice(start, end).forEach(row => row.style.display = '');
+
+      // Info text
+      if (filtered.length === 0) {
+        pageInfo.textContent = 'Aucun résultat trouvé';
+      } else {
+        pageInfo.textContent = `Affichage ${start + 1}–${Math.min(end, filtered.length)} sur ${filtered.length}`;
       }
-    });
+
+      // Build pagination buttons
+      pagination.innerHTML = '';
+
+      const prev = document.createElement('li');
+      prev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prev.innerHTML = `<a class="page-link" href="#">&laquo;</a>`;
+      prev.addEventListener('click', e => { e.preventDefault(); if (currentPage > 1) { currentPage--; render(); } });
+      pagination.appendChild(prev);
+
+      for (let p = 1; p <= totalPages; p++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${p === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#">${p}</a>`;
+        li.addEventListener('click', e => { e.preventDefault(); currentPage = p; render(); });
+        pagination.appendChild(li);
+      }
+
+      const next = document.createElement('li');
+      next.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+      next.innerHTML = `<a class="page-link" href="#">&raquo;</a>`;
+      next.addEventListener('click', e => { e.preventDefault(); if (currentPage < totalPages) { currentPage++; render(); } });
+      pagination.appendChild(next);
+
+      // Update chart based on all filtered rows (not just current page)
+      setTimeout(initializeObjectiveStatsChart, 50);
+    }
+
+    searchInput.addEventListener('input', () => { currentPage = 1; render(); });
+    document.addEventListener('DOMContentLoaded', render);
 
     // Initialize pie chart for objectives statistics
     function initializeObjectiveStatsChart() {
-      const rows = document.querySelectorAll('#objectivesTableBody tr:not([style*="display: none"])');
+      // Count statuses across ALL filtered rows (not just current page)
+      const filtered = getFilteredRows();
       const statusCounts = {};
       
-      rows.forEach(row => {
+      filtered.forEach(row => {
         const statusCell = row.cells[6];
         if (statusCell) {
           const status = statusCell.textContent.trim().toLowerCase();
@@ -482,11 +535,6 @@ if (isset($_GET['delete'])) {
     // Initialize chart on page load
     document.addEventListener('DOMContentLoaded', function() {
       initializeObjectiveStatsChart();
-      
-      // Re-initialize chart when search changes
-      searchInput.addEventListener('keyup', function() {
-        setTimeout(initializeObjectiveStatsChart, 100);
-      });
     });
   </script>
 </body>

@@ -205,6 +205,11 @@ if (isset($_GET['delete'])) {
                   </tbody>
                 </table>
               </div>
+              <!-- Pagination -->
+              <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                <div id="planPaginationInfo" class="text-muted small"></div>
+                <nav><ul class="pagination pagination-sm mb-0" id="planPagination"></ul></nav>
+              </div>
             </div>
           </div>
         </div>
@@ -234,40 +239,66 @@ if (isset($_GET['delete'])) {
   </div>
 
   <script>
-    // Dynamic search/filter
-    document.getElementById('planningSearchInput').addEventListener('input', function () {
-      const query = this.value.toLowerCase().trim();
-      const rows = document.querySelectorAll('#planningTableBody tr');
-      let visibleCount = 0;
+    // ── Pagination + Search for planning ────────────────────────────────
+    const searchInput = document.getElementById('planningSearchInput');
+    const tableBody   = document.getElementById('planningTableBody');
+    const pagination  = document.getElementById('planPagination');
+    const pageInfo    = document.getElementById('planPaginationInfo');
+    const PER_PAGE    = 10;
+    let currentPage   = 1;
 
-      rows.forEach(row => {
-        // Skip the "no results" placeholder row
-        if (row.cells.length === 1) return;
+    const allRows = Array.from(tableBody.querySelectorAll('tr'));
 
-        const text = Array.from(row.cells)
-          .slice(0, 8) // exclude Actions column
-          .map(cell => cell.textContent.toLowerCase())
-          .join(' ');
+    function getFilteredRows() {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) return allRows;
+      return allRows.filter(row =>
+        Array.from(row.cells).slice(0, 8).some(cell => cell.textContent.toLowerCase().includes(q))
+      );
+    }
 
-        const match = text.includes(query);
-        row.style.display = match ? '' : 'none';
-        if (match) visibleCount++;
-      });
+    function render() {
+      const filtered   = getFilteredRows();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
 
-      // Show "no results" message if nothing matches
-      let noResultRow = document.getElementById('noResultRow');
-      if (visibleCount === 0 && query !== '') {
-        if (!noResultRow) {
-          noResultRow = document.createElement('tr');
-          noResultRow.id = 'noResultRow';
-          noResultRow.innerHTML = '<td colspan="9" class="text-center text-muted">Aucun résultat trouvé</td>';
-          document.getElementById('planningTableBody').appendChild(noResultRow);
-        }
-        noResultRow.style.display = '';
-      } else if (noResultRow) {
-        noResultRow.style.display = 'none';
+      const start = (currentPage - 1) * PER_PAGE;
+      const end   = start + PER_PAGE;
+
+      allRows.forEach(row => row.style.display = 'none');
+      filtered.slice(start, end).forEach(row => row.style.display = '');
+
+      if (filtered.length === 0) {
+        pageInfo.textContent = 'Aucun résultat trouvé';
+      } else {
+        pageInfo.textContent = `Affichage ${start + 1}–${Math.min(end, filtered.length)} sur ${filtered.length}`;
       }
-    });
+
+      pagination.innerHTML = '';
+
+      const prev = document.createElement('li');
+      prev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prev.innerHTML = `<a class="page-link" href="#">&laquo;</a>`;
+      prev.addEventListener('click', e => { e.preventDefault(); if (currentPage > 1) { currentPage--; render(); } });
+      pagination.appendChild(prev);
+
+      for (let p = 1; p <= totalPages; p++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${p === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#">${p}</a>`;
+        li.addEventListener('click', e => { e.preventDefault(); currentPage = p; render(); });
+        pagination.appendChild(li);
+      }
+
+      const next = document.createElement('li');
+      next.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+      next.innerHTML = `<a class="page-link" href="#">&raquo;</a>`;
+      next.addEventListener('click', e => { e.preventDefault(); if (currentPage < totalPages) { currentPage++; render(); } });
+      pagination.appendChild(next);
+    }
+
+    searchInput.addEventListener('input', () => { currentPage = 1; render(); });
+    document.addEventListener('DOMContentLoaded', render);
 
     // Delete confirmation
     document.querySelectorAll('.delete-planning').forEach(button => {
