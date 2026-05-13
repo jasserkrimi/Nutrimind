@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Check if user is admin
@@ -22,7 +22,7 @@ $plannings = $planningController->getAllWithDetails();
 if (isset($_GET['delete'])) {
     $deleteId = htmlspecialchars($_GET['delete']);
     if ($planningController->delete($deleteId)) {
-        $_SESSION['success_message'] = "Plan supprimé avec succès!";
+        $_SESSION['success_message'] = "Plan supprimÃ© avec succÃ¨s!";
         header('Location: planning_list.php');
         exit;
     } else {
@@ -43,6 +43,12 @@ if (isset($_GET['delete'])) {
 
   <script type="module" crossorigin src="assets/js/main.js"></script>
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
+  <style>
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #content { margin-left: 250px !important; }
+  </style>
 </head>
 
 <body>
@@ -77,17 +83,29 @@ if (isset($_GET['delete'])) {
       <li><a class="nav-link" href="index.php#meals-section"><i class="ti ti-tools-kitchen-2"></i><span
             class="nav-text">Repas</span></a></li>
       <li><a class="nav-link" href="index.php#ingredients-section"><i class="ti ti-leaf"></i><span
-            class="nav-text">Ingrédients</span></a></li>
+            class="nav-text">IngrÃ©dients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link active" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Gérer les plans</span></a></li>
+            class="nav-text">GÃ©rer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Créer un plan</span></a></li>
+            class="nav-text">CrÃ©er un plan</span></a></li>
       <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
             class="nav-text">Objectifs</span></a></li>
 
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
+      <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+      <li><a class="nav-link" href="post_list.php"><i class="ti ti-article"></i><span
+            class="nav-text">Posts</span></a></li>
+      <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message"></i><span
+            class="nav-text">Commentaires</span></a></li>
+
+            <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a>
       </li>
     </ul>
   </aside>
@@ -100,10 +118,10 @@ if (isset($_GET['delete'])) {
           <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h1 class="fs-3 mb-1">Gestion des Plans</h1>
-              <p>Gérer les plans nutritionnels des utilisateurs</p>
+              <p>GÃ©rer les plans nutritionnels des utilisateurs</p>
             </div>
             <a href="planning_create.php" class="btn btn-primary">
-              <i class="ti ti-plus me-2"></i>Créer un Plan
+              <i class="ti ti-plus me-2"></i>CrÃ©er un Plan
             </a>
           </div>
         </div>
@@ -158,7 +176,7 @@ if (isset($_GET['delete'])) {
                       <th>Objectif</th>
                       <th>Titre</th>
                       <th>Calories/Jour</th>
-                      <th>Date Début</th>
+                      <th>Date DÃ©but</th>
                       <th>Date Fin</th>
                       <th>Statut</th>
                       <th>Actions</th>
@@ -167,7 +185,7 @@ if (isset($_GET['delete'])) {
                   <tbody id="planningTableBody">
                     <?php if (empty($plannings)): ?>
                       <tr>
-                        <td colspan="9" class="text-center">Aucun plan trouvé</td>
+                        <td colspan="9" class="text-center">Aucun plan trouvÃ©</td>
                       </tr>
                     <?php else: ?>
                       <?php foreach ($plannings as $planning): ?>
@@ -228,7 +246,7 @@ if (isset($_GET['delete'])) {
           </button>
         </div>
         <div class="modal-body">
-          Êtes-vous sûr de vouloir supprimer ce plan ? Cette action est irréversible.
+          ÃŠtes-vous sÃ»r de vouloir supprimer ce plan ? Cette action est irrÃ©versible.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
@@ -239,7 +257,7 @@ if (isset($_GET['delete'])) {
   </div>
 
   <script>
-    // ── Pagination + Search for planning ────────────────────────────────
+    // â”€â”€ Pagination + Search for planning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const searchInput = document.getElementById('planningSearchInput');
     const tableBody   = document.getElementById('planningTableBody');
     const pagination  = document.getElementById('planPagination');
@@ -269,9 +287,9 @@ if (isset($_GET['delete'])) {
       filtered.slice(start, end).forEach(row => row.style.display = '');
 
       if (filtered.length === 0) {
-        pageInfo.textContent = 'Aucun résultat trouvé';
+        pageInfo.textContent = 'Aucun rÃ©sultat trouvÃ©';
       } else {
-        pageInfo.textContent = `Affichage ${start + 1}–${Math.min(end, filtered.length)} sur ${filtered.length}`;
+        pageInfo.textContent = `Affichage ${start + 1}â€“${Math.min(end, filtered.length)} sur ${filtered.length}`;
       }
 
       pagination.innerHTML = '';
@@ -317,11 +335,11 @@ if (isset($_GET['delete'])) {
         modal.innerHTML = `
             <div class="logout-modal">
                 <div class="logout-modal-content">
-                    <h3>Confirmation de Déconnexion</h3>
-                    <p>Êtes-vous sûr de vouloir vous déconnecter?</p>
+                    <h3>Confirmation de DÃ©connexion</h3>
+                    <p>ÃŠtes-vous sÃ»r de vouloir vous dÃ©connecter?</p>
                     <div class="logout-modal-buttons">
                         <button class="logout-btn-cancel">Annuler</button>
-                        <button class="logout-btn-confirm">Déconnexion</button>
+                        <button class="logout-btn-confirm">DÃ©connexion</button>
                     </div>
                 </div>
             </div>

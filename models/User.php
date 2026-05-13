@@ -52,7 +52,7 @@ class User {
      * Login user - returns user data if credentials valid
      */
     public function login() {
-        $query = "SELECT id, nom, email, mot_de_passe, role, age, poids, taille, allergique, last_login, status 
+        $query = "SELECT id, nom, email, mot_de_passe, role, age, poids, taille, allergique, last_login 
                   FROM " . $this->table . " 
                   WHERE email = :email";
 
@@ -63,10 +63,6 @@ class User {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result && password_verify($this->mot_de_passe, $result['mot_de_passe'])) {
-            // Check if account is blocked
-            if (isset($result['status']) && $result['status'] === 'blocked') {
-                return ['blocked' => true];
-            }
             
             // Update last_login
             $updateQuery = "UPDATE " . $this->table . " SET last_login = NOW() WHERE id = :id";

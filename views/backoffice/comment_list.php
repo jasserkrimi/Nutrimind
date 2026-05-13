@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
     !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
@@ -8,30 +8,30 @@ require_once '../../controllers/CommentController.php';
 
 $commentController = new CommentController();
 
-// ─── Filters ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $statut_filter  = isset($_GET['statut']) ? trim($_GET['statut']) : '';
 $post_id_filter = isset($_GET['post_id']) ? (int)$_GET['post_id'] : null;
 $comments       = $commentController->getAll($statut_filter, $post_id_filter);
 $post_query_param = $post_id_filter ? '&post_id=' . $post_id_filter : '';
 $post_query_param_first = $post_id_filter ? '?post_id=' . $post_id_filter : '';
 
-// ─── Delete handler ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Delete handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['delete'])) {
     if ($commentController->delete((int)$_GET['delete'])) {
-        $_SESSION['success_message'] = 'Commentaire supprimé.';
+        $_SESSION['success_message'] = 'Commentaire supprimÃ©.';
     } else {
         $_SESSION['error_message'] = 'Erreur lors de la suppression.';
     }
     header('Location: comment_list.php'); exit;
 }
 
-// ─── Moderate handler (quick approve/reject) ──────────────────────────────────
+// â”€â”€â”€ Moderate handler (quick approve/reject) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['moderate']) && isset($_GET['statut'])) {
     $allowed = ['approuve','rejete','en_attente'];
     $newStat = trim($_GET['statut']);
     if (in_array($newStat, $allowed)) {
         $commentController->moderate((int)$_GET['moderate'], $newStat);
-        $_SESSION['success_message'] = 'Statut du commentaire mis à jour.';
+        $_SESSION['success_message'] = 'Statut du commentaire mis Ã  jour.';
     }
     header('Location: comment_list.php' . ($statut_filter ? '?statut=' . urlencode($statut_filter) : '')); exit;
 }
@@ -45,6 +45,12 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
   <link rel="icon" type="image/png" href="assets/images/logooo.png">
   <script type="module" crossorigin src="assets/js/main.js"></script>
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
+  <style>
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #content { margin-left: 250px !important; }
+  </style>
 </head>
 <body>
 <div id="overlay" class="overlay"></div>
@@ -68,18 +74,27 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
     </a>
   </div>
   <ul class="nav flex-column">
-    <li class="px-4 py-2"><small class="nav-text">Main</small></li>
-    <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span class="nav-text">Dashboard</span></a></li>
-    <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Users</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
+    <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span class="nav-text">Tableau de bord</span></a></li>
+    <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Utilisateurs</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
+    <li><a class="nav-link" href="meals.php"><i class="ti ti-tools-kitchen-2"></i><span class="nav-text">Repas</span></a></li>
+    <li><a class="nav-link" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">IngrÃ©dients</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
-    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">Manage Plans</span></a></li>
-    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">Create Plan</span></a></li>
-    <li class="px-4 py-2"><small class="nav-text">Posts</small></li>
-    <li><a class="nav-link" href="post_list.php"><i class="ti ti-news"></i><span class="nav-text">Manage Posts</span></a></li>
-    <li><a class="nav-link" href="post_create.php"><i class="ti ti-plus"></i><span class="nav-text">Create Post</span></a></li>
-    <li><a class="nav-link active" href="comment_list.php"><i class="ti ti-message-2"></i><span class="nav-text">Comments</span></a></li>
-    <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
-    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a></li>
+    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">GÃ©rer les plans</span></a></li>
+    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">CrÃ©er un plan</span></a></li>
+    <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span class="nav-text">Objectifs</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+    <li><a class="nav-link" href="post_list.php"><i class="ti ti-article"></i><span class="nav-text">Posts</span></a></li>
+    <li><a class="nav-link active" href="comment_list.php"><i class="ti ti-message"></i><span class="nav-text">Commentaires</span></a></li>
+          <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a></li>
   </ul>
 </aside>
 
@@ -92,7 +107,7 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
       <div class="col-12 d-flex justify-content-between align-items-center">
         <div>
           <h1 class="fs-3 mb-1">Gestion des Commentaires</h1>
-          <p class="text-muted mb-0">Modérez les commentaires de la communauté</p>
+          <p class="text-muted mb-0">ModÃ©rez les commentaires de la communautÃ©</p>
         </div>
         <a href="post_list.php" class="btn btn-outline-secondary">
           <i class="ti ti-news me-1"></i> Voir les Posts
@@ -118,9 +133,9 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
     <div class="row g-3 mb-4">
       <?php
       $statDef = [
-        'approuve'   => ['success','ti-check',    'Approuvés'],
+        'approuve'   => ['success','ti-check',    'ApprouvÃ©s'],
         'en_attente' => ['warning','ti-clock',    'En attente'],
-        'rejete'     => ['danger', 'ti-ban',      'Rejetés'],
+        'rejete'     => ['danger', 'ti-ban',      'RejetÃ©s'],
       ];
       foreach ($statDef as $s => [$color, $icon, $label]):
           $cnt = $commentController->countByStatut($s);
@@ -148,13 +163,13 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
           Tous
         </a>
         <a href="comment_list.php?statut=approuve<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'approuve' ? 'btn-success' : 'btn-outline-success' ?>">
-          <i class="ti ti-check"></i> Approuvés
+          <i class="ti ti-check"></i> ApprouvÃ©s
         </a>
         <a href="comment_list.php?statut=en_attente<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'en_attente' ? 'btn-warning' : 'btn-outline-warning' ?>">
           <i class="ti ti-clock"></i> En attente
         </a>
         <a href="comment_list.php?statut=rejete<?= $post_query_param ?>" class="btn btn-sm <?= $statut_filter === 'rejete' ? 'btn-danger' : 'btn-outline-danger' ?>">
-          <i class="ti ti-ban"></i> Rejetés
+          <i class="ti ti-ban"></i> RejetÃ©s
         </a>
       </div>
     </div>
@@ -180,7 +195,7 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
                 <tr>
                   <td colspan="7" class="text-center py-4 text-muted">
                     <i class="ti ti-message-off fs-3 mb-2 d-block opacity-50"></i>
-                    Aucun commentaire trouvé
+                    Aucun commentaire trouvÃ©
                   </td>
                 </tr>
               <?php else: ?>
@@ -189,7 +204,7 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
                     <td><small class="text-muted">#<?= $c['id_comment'] ?></small></td>
                     <td>
                       <small class="fw-semibold">
-                        <?= htmlspecialchars(mb_strimwidth($c['post_titre'] ?? 'N/A', 0, 40, '…')) ?>
+                        <?= htmlspecialchars(mb_strimwidth($c['post_titre'] ?? 'N/A', 0, 40, 'â€¦')) ?>
                       </small>
                     </td>
                     <td>
@@ -198,7 +213,7 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
                     </td>
                     <td>
                       <span title="<?= htmlspecialchars($c['contenu']) ?>">
-                        <?= htmlspecialchars(mb_strimwidth($c['contenu'], 0, 60, '…')) ?>
+                        <?= htmlspecialchars(mb_strimwidth($c['contenu'], 0, 60, 'â€¦')) ?>
                       </span>
                     </td>
                     <td>
@@ -256,7 +271,7 @@ if (isset($_GET['moderate']) && isset($_GET['statut'])) {
         <h5 class="modal-title">Confirmer la suppression</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">Êtes-vous sûr de vouloir supprimer ce commentaire ?</div>
+      <div class="modal-body">ÃŠtes-vous sÃ»r de vouloir supprimer ce commentaire ?</div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
         <a href="#" id="confirmDelete" class="btn btn-danger">Supprimer</a>
@@ -279,10 +294,11 @@ document.querySelectorAll('.delete-comment').forEach(btn => {
   });
 });
 function logout(){
-  if(confirm('Se déconnecter ?'))
+  if(confirm('Se dÃ©connecter ?'))
     fetch('../../controllers/UserController.php?action=logout')
       .then(r=>r.json()).then(d=>{ if(d.success) window.location.href='../index.php'; });
 }
 </script>
 </body>
 </html>
+

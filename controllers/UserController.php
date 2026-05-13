@@ -1172,6 +1172,8 @@ class UserController {
 }
 
 if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    ob_start(); // Buffer any stray output (warnings, notices, connection errors)
+
     // Handle requests
     $method = $_POST['action'] ?? $_GET['action'] ?? null;
 
@@ -1334,6 +1336,7 @@ if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
     }
 
     // Return JSON response
+    ob_end_clean(); // Discard any stray output before sending JSON
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;

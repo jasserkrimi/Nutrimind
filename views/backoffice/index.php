@@ -1,52 +1,77 @@
-<?php
+﻿<?php
 
 session_start();
 
-
-
-// Check if user is admin
-
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || 
-
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
     !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-
-    // Redirect non-admin users to home page
-
     header('Location: ../index.php');
-
     exit;
-
 }
 
-
-
-// Include controllers
-
 require_once '../../controllers/MealController.php';
-
 require_once '../../controllers/IngredientController.php';
-
 require_once __DIR__ . '/../../controllers/UserController.php';
-
+require_once __DIR__ . '/../../controllers/PostController.php';
+require_once __DIR__ . '/../../controllers/CommentController.php';
 require_once __DIR__ . '/../../models/Objectif.php';
+require_once __DIR__ . '/../../config/Database.php';
 
-
-
-// Initialize controllers
-
-$mealController = new MealController();
-
+$mealController      = new MealController();
 $ingredientController = new IngredientController();
+$postController      = new PostController();
+$commentController   = new CommentController();
+$objectifModel       = new Objectif();
 
-$userController = new UserController();
+$db = (new Database())->connect();
 
-
-
-// Get data
-
-$meals = $mealController->getAll();
-
+// â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$meals       = $mealController->getAll();
 $ingredients = $ingredientController->getAll();
+$allPosts    = $postController->getAll('', '', '');
+$allComments = $commentController->getAll('', null);
+$allObjectives = $objectifModel->getAll();
+
+// Users stats
+$usersStmt = $db->query("SELECT COUNT(*) as total, SUM(CASE WHEN role='admin' THEN 1 ELSE 0 END) as admins FROM user");
+$usersStats = $usersStmt->fetch(PDO::FETCH_ASSOC);
+
+// Comments by status
+$commentsApproved  = count(array_filter($allComments, fn($c) => $c['statut'] === 'approuve'));
+$commentsPending   = count(array_filter($allComments, fn($c) => $c['statut'] === 'en_attente'));
+
+// Posts by status
+$postsPublished = count(array_filter($allPosts, fn($p) => $p['statut'] === 'publie'));
+$postsDraft     = count(array_filter($allPosts, fn($p) => $p['statut'] !== 'publie'));
+
+// Recent activity
+$recentPosts    = array_slice($allPosts, 0, 5);
+$recentComments = array_slice($allComments, 0, 5);
+
+// New objectives notification
+$lastSeenId = $_SESSION['admin_last_seen_objectif_id'] ?? 0;
+if (isset($_POST['mark_objectives_seen'])) {
+    if (!empty($allObjectives)) {
+        $_SESSION['admin_last_seen_objectif_id'] = max(array_column($allObjectives, 'id_objectif'));
+    }
+    header('Location: index.php'); exit;
+}
+$newObjectives = [];
+foreach ($allObjectives as $obj) {
+    if ($obj['id_objectif'] > $lastSeenId) { $newObjectives = [$obj]; break; }
+}
+
+// Handle delete operations
+if (isset($_GET['delete_meal'])) {
+    $mealController->delete((int)$_GET['delete_meal']);
+    $_SESSION['success_message'] = "Repas supprimÃ©.";
+    header('Location: index.php'); exit;
+}
+if (isset($_GET['delete_ingredient'])) {
+    $ingredientController->delete((int)$_GET['delete_ingredient']);
+    $_SESSION['success_message'] = "IngrÃ©dient supprimÃ©.";
+    header('Location: index.php'); exit;
+}
+?>
 
 
 
@@ -86,7 +111,7 @@ if (isset($_GET['delete_meal'])) {
 
     if ($mealController->delete($deleteId)) {
 
-        $_SESSION['success_message'] = "Repas supprimé avec succès!";
+        $_SESSION['success_message'] = "Repas supprimÃ© avec succÃ¨s!";
 
         header('Location: index.php');
 
@@ -108,7 +133,7 @@ if (isset($_GET['delete_ingredient'])) {
 
     if ($ingredientController->delete($deleteId)) {
 
-        $_SESSION['success_message'] = "Ingrédient supprimé avec succès!";
+        $_SESSION['success_message'] = "IngrÃ©dient supprimÃ© avec succÃ¨s!";
 
         header('Location: index.php');
 
@@ -116,7 +141,7 @@ if (isset($_GET['delete_ingredient'])) {
 
     } else {
 
-        $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrédient!";
+        $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrÃ©dient!";
 
     }
 
@@ -163,6 +188,12 @@ if (isset($_GET['delete_ingredient'])) {
   <script type="module" crossorigin src="assets/js/main.js"></script>
 
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
+  <style>
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #content { margin-left: 250px !important; }
+  </style>
 
 </head>
 
@@ -382,7 +413,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                   <i class="ti ti-logout text-danger"></i>
 
-                  <span>Déconnexion</span>
+                  <span>DÃ©connexion</span>
 
                 </a>
 
@@ -424,17 +455,29 @@ if (isset($_GET['delete_ingredient'])) {
       <li><a class="nav-link" href="meals.php"><i class="ti ti-tools-kitchen-2"></i><span
             class="nav-text">Repas</span></a></li>
       <li><a class="nav-link" href="ingredients.php"><i class="ti ti-leaf"></i><span
-            class="nav-text">Ingrédients</span></a></li>
+            class="nav-text">IngrÃ©dients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Gérer les plans</span></a></li>
+            class="nav-text">GÃ©rer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Créer un plan</span></a></li>
+            class="nav-text">CrÃ©er un plan</span></a></li>
       <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
             class="nav-text">Objectifs</span></a></li>
 
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
+      <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+      <li><a class="nav-link" href="post_list.php"><i class="ti ti-article"></i><span
+            class="nav-text">Posts</span></a></li>
+      <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message"></i><span
+            class="nav-text">Commentaires</span></a></li>
+
+            <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a>
       </li>
     </ul>
 
@@ -456,7 +499,7 @@ if (isset($_GET['delete_ingredient'])) {
 
             <h1 class="fs-3 mb-1">Tableau de Bord</h1>
 
-            <p>Votre contenu principal va ici…</p>
+            <p>Votre contenu principal va iciâ€¦</p>
 
           </div>
 
@@ -475,7 +518,7 @@ if (isset($_GET['delete_ingredient'])) {
                 </div>
                 <div>
                   <h2 class="mb-1 fs-6 text-body">Objectifs</h2>
-                  <p class="text-primary mb-0 small fw-semibold">Gérer les objectifs →</p>
+                  <p class="text-primary mb-0 small fw-semibold">GÃ©rer les objectifs â†’</p>
                 </div>
               </div>
             </div>
@@ -921,7 +964,7 @@ if (isset($_GET['delete_ingredient'])) {
 
 
 
-        <!-- CARD 1 — Top Selling Products -->
+        <!-- CARD 1 â€” Top Selling Products -->
 
         <div class="col-lg-4">
 
@@ -959,7 +1002,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">$89 </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>1,250 Units</small>
 
@@ -987,7 +1030,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">$49 </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>5,420 Units</small>
 
@@ -1015,7 +1058,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">$98 </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>862 Units</small>
 
@@ -1041,7 +1084,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">$35 </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>3,200 Units</small>
 
@@ -1067,7 +1110,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">$65 </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>2,890 Units</small>
 
@@ -1089,7 +1132,7 @@ if (isset($_GET['delete_ingredient'])) {
 
 
 
-        <!-- CARD 2 — Low Stock Products -->
+        <!-- CARD 2 â€” Low Stock Products -->
 
         <div class="col-lg-4">
 
@@ -1237,7 +1280,7 @@ if (isset($_GET['delete_ingredient'])) {
 
 
 
-        <!-- CARD 3 — Recent Sales -->
+        <!-- CARD 3 â€” Recent Sales -->
 
         <div class="col-lg-4">
 
@@ -1273,7 +1316,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">Computers </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>2,$2,499</small>
 
@@ -1301,7 +1344,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">Audio </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>$549</small>
 
@@ -1329,7 +1372,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">Tablets </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>$799</small>
 
@@ -1355,7 +1398,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">Wearables </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>$799</small>
 
@@ -1381,7 +1424,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <small class="fw-semibold">Accessories </small>
 
-                    <small>•</small>
+                    <small>â€¢</small>
 
                     <small>$299</small>
 
@@ -1477,7 +1520,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <option value="name-desc">Trier par: Nom (Z-A)</option>
 
-                    <option value="date-newest">Trier par: Date (Plus récent)</option>
+                    <option value="date-newest">Trier par: Date (Plus rÃ©cent)</option>
 
                     <option value="date-oldest">Trier par: Date (Plus ancien)</option>
 
@@ -1513,7 +1556,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                       <tr>
 
-                        <td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td>
+                        <td colspan="4" class="text-center"><em>Aucun repas trouvÃ©</em></td>
 
                       </tr>
 
@@ -1567,7 +1610,7 @@ if (isset($_GET['delete_ingredient'])) {
 
             <div class="card-header bg-white d-flex justify-content-between align-items-center px-4 py-3">
 
-              <h4 class="mb-0 h5"><i class="ti ti-leaf me-2"></i>Gestion des Ingrédients</h4>
+              <h4 class="mb-0 h5"><i class="ti ti-leaf me-2"></i>Gestion des IngrÃ©dients</h4>
 
             </div>
 
@@ -1579,7 +1622,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                 <div class="col-md-6">
 
-                  <input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrédients par nom...">
+                  <input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrÃ©dients par nom...">
 
                 </div>
 
@@ -1591,13 +1634,13 @@ if (isset($_GET['delete_ingredient'])) {
 
                     <option value="name-desc">Trier par: Nom (Z-A)</option>
 
-                    <option value="calories-high">Trier par: Calories (Haut à Bas)</option>
+                    <option value="calories-high">Trier par: Calories (Haut Ã  Bas)</option>
 
-                    <option value="calories-low">Trier par: Calories (Bas à Haut)</option>
+                    <option value="calories-low">Trier par: Calories (Bas Ã  Haut)</option>
 
-                    <option value="protein-high">Trier par: Protéines (Haut à Bas)</option>
+                    <option value="protein-high">Trier par: ProtÃ©ines (Haut Ã  Bas)</option>
 
-                    <option value="protein-low">Trier par: Protéines (Bas à Haut)</option>
+                    <option value="protein-low">Trier par: ProtÃ©ines (Bas Ã  Haut)</option>
 
                   </select>
 
@@ -1635,7 +1678,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                       <tr>
 
-                        <td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td>
+                        <td colspan="6" class="text-center"><em>Aucun ingrÃ©dient trouvÃ©</em></td>
 
                       </tr>
 
@@ -1689,7 +1732,7 @@ if (isset($_GET['delete_ingredient'])) {
 
 <footer class="text-center py-2 mt-6 text-secondary ">
 
-        <p class="mb-0">Copyright © 2026 InApp Inventory Dashboard. Developed by <a href="https://codescandy.com/" target="_blank" class="text-success">CodesCandy</a> • Distributed by <a href="https://themewagon.com/" target="_blank" class="text-success">ThemeWagon</a> </p>
+        <p class="mb-0">Copyright Â© 2026 InApp Inventory Dashboard. Developed by <a href="https://codescandy.com/" target="_blank" class="text-success">CodesCandy</a> â€¢ Distributed by <a href="https://themewagon.com/" target="_blank" class="text-success">ThemeWagon</a> </p>
 
       </footer>
 
@@ -1731,15 +1774,15 @@ if (isset($_GET['delete_ingredient'])) {
 
                 <div class="logout-modal-content">
 
-                    <h3>Confirmation de Déconnexion</h3>
+                    <h3>Confirmation de DÃ©connexion</h3>
 
-                    <p>Êtes-vous sûr de vouloir vous déconnecter?</p>
+                    <p>ÃŠtes-vous sÃ»r de vouloir vous dÃ©connecter?</p>
 
                     <div class="logout-modal-buttons">
 
                         <button class="logout-btn-cancel">Annuler</button>
 
-                        <button class="logout-btn-confirm">Déconnexion</button>
+                        <button class="logout-btn-confirm">DÃ©connexion</button>
 
                     </div>
 
@@ -1875,7 +1918,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                 const mealId = this.getAttribute('data-id');
 
-                if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+                if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce repas ?')) {
 
                     window.location.href = `index.php?delete_meal=${mealId}`;
 
@@ -1897,7 +1940,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                 const ingredientId = this.getAttribute('data-id');
 
-                if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+                if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cet ingrÃ©dient ?')) {
 
                     window.location.href = `index.php?delete_ingredient=${ingredientId}`;
 
@@ -1949,7 +1992,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                 const cells = row.querySelectorAll('td');
 
-                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun repas trouvé') {
+                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun repas trouvÃ©') {
 
                     mealsData.push({
 
@@ -2017,7 +2060,7 @@ if (isset($_GET['delete_ingredient'])) {
 
             if (filteredMeals.length === 0) {
 
-                mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center"><em>Aucun repas trouvé</em></td></tr>';
+                mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center"><em>Aucun repas trouvÃ©</em></td></tr>';
 
             } else {
 
@@ -2061,7 +2104,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                 const cells = row.querySelectorAll('td');
 
-                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun ingrédient trouvé') {
+                if (cells.length > 0 && cells[0].textContent.trim() !== 'Aucun ingrÃ©dient trouvÃ©') {
 
                     ingredientsData.push({
 
@@ -2141,7 +2184,7 @@ if (isset($_GET['delete_ingredient'])) {
 
             if (filteredIngredients.length === 0) {
 
-                ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><em>Aucun ingrédient trouvé</em></td></tr>';
+                ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center"><em>Aucun ingrÃ©dient trouvÃ©</em></td></tr>';
 
             } else {
 
@@ -2173,7 +2216,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     const mealId = this.getAttribute('data-id');
 
-                    if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+                    if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce repas ?')) {
 
                         window.location.href = `index.php?delete_meal=${mealId}`;
 
@@ -2193,7 +2236,7 @@ if (isset($_GET['delete_ingredient'])) {
 
                     const ingredientId = this.getAttribute('data-id');
 
-                    if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+                    if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cet ingrÃ©dient ?')) {
 
                         window.location.href = `index.php?delete_ingredient=${ingredientId}`;
 
@@ -2450,11 +2493,11 @@ if (isset($_GET['delete_ingredient'])) {
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="newObjectivesModalLabel">Nouveaux objectifs ajoutés</h5>
+          <h5 class="modal-title" id="newObjectivesModalLabel">Nouveaux objectifs ajoutÃ©s</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <p>Les objectifs suivants ont été ajoutés depuis votre dernière visite :</p>
+          <p>Les objectifs suivants ont Ã©tÃ© ajoutÃ©s depuis votre derniÃ¨re visite :</p>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -2464,7 +2507,7 @@ if (isset($_GET['delete_ingredient'])) {
                   <th>Valeur cible</th>
                   <th>Date limite</th>
                   <th>Statut</th>
-                  <th>Créé le</th>
+                  <th>CrÃ©Ã© le</th>
                 </tr>
               </thead>
               <tbody>
@@ -2501,7 +2544,7 @@ if (isset($_GET['delete_ingredient'])) {
 
   <script>
     <?php if (!empty($newObjectives)): ?>
-      // Afficher le modal automatiquement — une seule fois par lot de nouveaux objectifs
+      // Afficher le modal automatiquement â€” une seule fois par lot de nouveaux objectifs
       document.addEventListener('DOMContentLoaded', function() {
         var modal = new bootstrap.Modal(document.getElementById('newObjectivesModal'));
         modal.show();

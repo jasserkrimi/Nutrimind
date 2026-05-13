@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Admin check
@@ -16,9 +16,9 @@ $ingredientController = new IngredientController();
 if (isset($_GET['delete_ingredient'])) {
     $deleteId = htmlspecialchars($_GET['delete_ingredient']);
     if ($ingredientController->delete($deleteId)) {
-        $_SESSION['success_message'] = "Ingrédient supprimé avec succès!";
+        $_SESSION['success_message'] = "IngrÃ©dient supprimÃ© avec succÃ¨s!";
     } else {
-        $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrédient!";
+        $_SESSION['error_message'] = "Erreur lors de la suppression de l'ingrÃ©dient!";
     }
     header('Location: ingredients.php?page=' . (isset($_GET['page']) ? (int)$_GET['page'] : 1));
     exit;
@@ -37,7 +37,7 @@ $currentPage = $paginationData['currentPage'];
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ingrédients — NutriMind Admin</title>
+  <title>IngrÃ©dients â€” NutriMind Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logooo.png">
   <script type="module" crossorigin src="assets/js/main.js"></script>
@@ -74,7 +74,7 @@ $currentPage = $paginationData['currentPage'];
               <i class="ti ti-user text-success"></i><span>Profil</span>
             </a>
             <a href="#" onclick="logout(); return false;" class="text-decoration-none text-body d-flex align-items-center gap-2 px-2 py-2 rounded">
-              <i class="ti ti-logout text-danger"></i><span>Déconnexion</span>
+              <i class="ti ti-logout text-danger"></i><span>DÃ©connexion</span>
             </a>
           </div>
         </div>
@@ -94,13 +94,19 @@ $currentPage = $paginationData['currentPage'];
     <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Utilisateurs</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
     <li><a class="nav-link" href="meals.php"><i class="ti ti-tools-kitchen-2"></i><span class="nav-text">Repas</span></a></li>
-    <li><a class="nav-link active" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">Ingrédients</span></a></li>
+    <li><a class="nav-link active" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">IngrÃ©dients</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
-    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">Gérer les plans</span></a></li>
-    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">Créer un plan</span></a></li>
+    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">GÃ©rer les plans</span></a></li>
+    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">CrÃ©er un plan</span></a></li>
     <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span class="nav-text">Objectifs</span></a></li>
+          <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
     <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a></li>
+    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a></li>
   </ul>
 </aside>
 
@@ -111,8 +117,8 @@ $currentPage = $paginationData['currentPage'];
     <!-- Page header -->
     <div class="row mb-4">
       <div class="col-12">
-        <h1 class="fs-3 mb-1"><i class="ti ti-leaf me-2 text-success"></i>Gestion des Ingrédients</h1>
-        <p class="text-muted mb-0"><?php echo $totalItems; ?> ingrédients enregistrés</p>
+        <h1 class="fs-3 mb-1"><i class="ti ti-leaf me-2 text-success"></i>Gestion des IngrÃ©dients</h1>
+        <p class="text-muted mb-0"><?php echo $totalItems; ?> ingrÃ©dients enregistrÃ©s</p>
       </div>
     </div>
 
@@ -138,16 +144,16 @@ $currentPage = $paginationData['currentPage'];
             <!-- Search and Sort -->
             <div class="row g-2">
               <div class="col-md-6">
-                <input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrédients par nom...">
+                <input type="text" id="ingredientsSearchInput" class="form-control" placeholder="Rechercher les ingrÃ©dients par nom...">
               </div>
               <div class="col-md-6">
                 <select id="ingredientsSortSelect" class="form-select">
                   <option value="name-asc">Trier par: Nom (A-Z)</option>
                   <option value="name-desc">Trier par: Nom (Z-A)</option>
-                  <option value="calories-high">Trier par: Calories (Haut à Bas)</option>
-                  <option value="calories-low">Trier par: Calories (Bas à Haut)</option>
-                  <option value="protein-high">Trier par: Protéines (Haut à Bas)</option>
-                  <option value="protein-low">Trier par: Protéines (Bas à Haut)</option>
+                  <option value="calories-high">Trier par: Calories (Haut Ã  Bas)</option>
+                  <option value="calories-low">Trier par: Calories (Bas Ã  Haut)</option>
+                  <option value="protein-high">Trier par: ProtÃ©ines (Haut Ã  Bas)</option>
+                  <option value="protein-low">Trier par: ProtÃ©ines (Bas Ã  Haut)</option>
                 </select>
               </div>
             </div>
@@ -167,7 +173,7 @@ $currentPage = $paginationData['currentPage'];
                 </thead>
                 <tbody id="ingredientsTableBody">
                   <?php if (empty($ingredients)): ?>
-                    <tr><td colspan="6" class="text-center py-4"><em>Aucun ingrédient trouvé</em></td></tr>
+                    <tr><td colspan="6" class="text-center py-4"><em>Aucun ingrÃ©dient trouvÃ©</em></td></tr>
                   <?php else: ?>
                     <?php foreach ($ingredients as $ing): ?>
                       <tr>
@@ -196,7 +202,7 @@ $currentPage = $paginationData['currentPage'];
               <?php
                 $from = ($currentPage - 1) * $perPage + 1;
                 $to   = min($currentPage * $perPage, $totalItems);
-                echo "Affichage de $from à $to sur $totalItems ingrédients";
+                echo "Affichage de $from Ã  $to sur $totalItems ingrÃ©dients";
               ?>
             </small>
             <nav>
@@ -221,7 +227,7 @@ $currentPage = $paginationData['currentPage'];
     </div>
 
     <footer class="text-center py-4 mt-4 text-secondary">
-      <p class="mb-0">Copyright © 2026 NutriMind Admin</p>
+      <p class="mb-0">Copyright Â© 2026 NutriMind Admin</p>
     </footer>
 
   </div>
@@ -232,7 +238,7 @@ $currentPage = $paginationData['currentPage'];
   document.querySelectorAll('.delete-ingredient').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
-      if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+      if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cet ingrÃ©dient ?')) {
         window.location.href = 'ingredients.php?delete_ingredient=' + this.getAttribute('data-id');
       }
     });
@@ -272,7 +278,7 @@ $currentPage = $paginationData['currentPage'];
     if (sort === 'protein-high')   filtered.sort(function (a,b) { return b.proteins - a.proteins; });
     if (sort === 'protein-low')    filtered.sort(function (a,b) { return a.proteins - b.proteins; });
     if (filtered.length === 0) {
-      ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><em>Aucun ingrédient trouvé</em></td></tr>';
+      ingredientsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><em>Aucun ingrÃ©dient trouvÃ©</em></td></tr>';
     } else {
       ingredientsTableBody.innerHTML = filtered.map(function (i) {
         return '<tr><td>' + i.name + '</td><td>' + i.calories + '</td><td>' + i.proteins +
@@ -281,7 +287,7 @@ $currentPage = $paginationData['currentPage'];
       document.querySelectorAll('.delete-ingredient').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
-          if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+          if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cet ingrÃ©dient ?')) {
             window.location.href = 'ingredients.php?delete_ingredient=' + this.getAttribute('data-id');
           }
         });
@@ -294,7 +300,7 @@ $currentPage = $paginationData['currentPage'];
   initIngredients();
 
   function logout() {
-    if (confirm('Voulez-vous vous déconnecter ?')) {
+    if (confirm('Voulez-vous vous dÃ©connecter ?')) {
       window.location.href = '../auth.php?logout=1';
     }
   }
@@ -302,3 +308,4 @@ $currentPage = $paginationData['currentPage'];
 
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true ||
     !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
@@ -10,7 +10,7 @@ require_once '../../controllers/CommentController.php';
 $postController    = new PostController();
 $commentController = new CommentController();
 
-// ─── Filters ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $search    = isset($_GET['search'])    ? trim($_GET['search'])    : '';
 $categorie = isset($_GET['categorie']) ? trim($_GET['categorie']) : '';
 $statut    = isset($_GET['statut'])    ? trim($_GET['statut'])    : '';
@@ -19,10 +19,10 @@ $posts      = $postController->getAll($search, $categorie, $statut);
 $categories = \Post::getCategories();
 $statuts    = \Post::getStatuts();
 
-// ─── Delete handler ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Delete handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['delete'])) {
     if ($postController->delete((int)$_GET['delete'])) {
-        $_SESSION['success_message'] = 'Post supprimé avec succès.';
+        $_SESSION['success_message'] = 'Post supprimÃ© avec succÃ¨s.';
     } else {
         $_SESSION['error_message'] = 'Erreur lors de la suppression.';
     }
@@ -38,6 +38,12 @@ if (isset($_GET['delete'])) {
   <link rel="icon" type="image/png" href="assets/images/logooo.png">
   <script type="module" crossorigin src="assets/js/main.js"></script>
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
+  <style>
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #content { margin-left: 250px !important; }
+  </style>
 </head>
 <body>
 <div id="overlay" class="overlay"></div>
@@ -59,18 +65,27 @@ if (isset($_GET['delete'])) {
     <a href="index.php" class="d-inline-flex"><img src="assets/images/logooo.png" alt="Nutrimind" style="max-height:50px;width:auto;"></a>
   </div>
   <ul class="nav flex-column">
-    <li class="px-4 py-2"><small class="nav-text">Main</small></li>
-    <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span class="nav-text">Dashboard</span></a></li>
-    <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Users</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">Principal</small></li>
+    <li><a class="nav-link" href="index.php"><i class="ti ti-home"></i><span class="nav-text">Tableau de bord</span></a></li>
+    <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Utilisateurs</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
+    <li><a class="nav-link" href="meals.php"><i class="ti ti-tools-kitchen-2"></i><span class="nav-text">Repas</span></a></li>
+    <li><a class="nav-link" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">IngrÃ©dients</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
-    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">Manage Plans</span></a></li>
-    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">Create Plan</span></a></li>
-    <li class="px-4 py-2"><small class="nav-text">Posts</small></li>
-    <li><a class="nav-link active" href="post_list.php"><i class="ti ti-news"></i><span class="nav-text">Manage Posts</span></a></li>
-    <li><a class="nav-link" href="post_create.php"><i class="ti ti-plus"></i><span class="nav-text">Create Post</span></a></li>
-    <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message-2"></i><span class="nav-text">Comments</span></a></li>
-    <li class="px-4 pt-4 pb-2"><small class="nav-text">Account</small></li>
-    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a></li>
+    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">GÃ©rer les plans</span></a></li>
+    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">CrÃ©er un plan</span></a></li>
+    <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span class="nav-text">Objectifs</span></a></li>
+    <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+    <li><a class="nav-link active" href="post_list.php"><i class="ti ti-article"></i><span class="nav-text">Posts</span></a></li>
+    <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message"></i><span class="nav-text">Commentaires</span></a></li>
+          <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a></li>
   </ul>
 </aside>
 
@@ -83,10 +98,10 @@ if (isset($_GET['delete'])) {
       <div class="col-12 d-flex justify-content-between align-items-center">
         <div>
           <h1 class="fs-3 mb-1">Gestion des Posts</h1>
-          <p class="text-muted mb-0">Administrez tous les posts de la communauté</p>
+          <p class="text-muted mb-0">Administrez tous les posts de la communautÃ©</p>
         </div>
         <a href="post_create.php" class="btn btn-primary">
-          <i class="ti ti-plus me-1"></i> Créer un Post
+          <i class="ti ti-plus me-1"></i> CrÃ©er un Post
         </a>
       </div>
     </div>
@@ -139,7 +154,7 @@ if (isset($_GET['delete'])) {
                    placeholder="Titre ou contenu..." value="<?= htmlspecialchars($search) ?>" maxlength="100">
           </div>
           <div class="col-md-3">
-            <label class="form-label small fw-semibold">Catégorie</label>
+            <label class="form-label small fw-semibold">CatÃ©gorie</label>
             <select name="categorie" class="form-select form-select-sm">
               <option value="">Toutes</option>
               <?php foreach ($categories as $cat): ?>
@@ -180,7 +195,7 @@ if (isset($_GET['delete'])) {
                 <th>ID</th>
                 <th>Titre</th>
                 <th>Auteur</th>
-                <th>Catégorie</th>
+                <th>CatÃ©gorie</th>
                 <th>Statut</th>
                 <th>Commentaires</th>
                 <th>Date</th>
@@ -189,13 +204,13 @@ if (isset($_GET['delete'])) {
             </thead>
             <tbody>
               <?php if (empty($posts)): ?>
-                <tr><td colspan="8" class="text-center py-4 text-muted">Aucun post trouvé</td></tr>
+                <tr><td colspan="8" class="text-center py-4 text-muted">Aucun post trouvÃ©</td></tr>
               <?php else: ?>
                 <?php foreach ($posts as $p): ?>
                   <tr>
                     <td><small class="text-muted">#<?= $p['id_post'] ?></small></td>
                     <td>
-                      <span class="fw-semibold"><?= htmlspecialchars(mb_strimwidth($p['titre'], 0, 50, '…')) ?></span>
+                      <span class="fw-semibold"><?= htmlspecialchars(mb_strimwidth($p['titre'], 0, 50, 'â€¦')) ?></span>
                     </td>
                     <td><?= htmlspecialchars($p['auteur_nom'] ?? 'Anonyme') ?></td>
                     <td><span class="badge bg-secondary"><?= htmlspecialchars($p['categorie']) ?></span></td>
@@ -230,7 +245,7 @@ if (isset($_GET['delete'])) {
         </div>
       </div>
       <div class="card-footer text-muted small">
-        <?= count($posts) ?> post(s) trouvé(s)
+        <?= count($posts) ?> post(s) trouvÃ©(s)
       </div>
     </div>
   </div>
@@ -263,10 +278,11 @@ document.querySelectorAll('.delete-post').forEach(btn => {
   });
 });
 function logout(){
-  if(confirm('Se déconnecter ?'))
+  if(confirm('Se dÃ©connecter ?'))
     fetch('../../controllers/UserController.php?action=logout')
       .then(r=>r.json()).then(d=>{ if(d.success) window.location.href='../index.php'; });
 }
 </script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Check if user is admin
@@ -39,6 +39,11 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
   <script type="module" crossorigin src="assets/js/main.js"></script>
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
   <style>
+    /* Force sidebar always expanded */
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #content { margin-left: 250px !important; }
     .role-badge {
       display: inline-block;
       padding: 0.35rem 0.65rem;
@@ -100,11 +105,11 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
               <div class="p-3 d-flex flex-column gap-2 small lh-lg">
                 <a href="profile.php" class="text-decoration-none text-body d-flex align-items-center gap-2 px-2 py-2 rounded" style="transition: all 0.2s ease;">
                   <i class="ti ti-user text-success"></i>
-                  <span>Déconnexion</span>
+                  <span>DÃ©connexion</span>
                 </a>
                 <a href="#" onclick="logout(); return false;" class="text-decoration-none text-body d-flex align-items-center gap-2 px-2 py-2 rounded" style="transition: all 0.2s ease;">
                   <i class="ti ti-logout text-danger"></i>
-                  <span>Déconnexion</span>
+                  <span>DÃ©connexion</span>
                 </a>
               </div>
             </div>
@@ -134,17 +139,29 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
       <li><a class="nav-link" href="index.php#meals-section"><i class="ti ti-tools-kitchen-2"></i><span
             class="nav-text">Repas</span></a></li>
       <li><a class="nav-link" href="index.php#ingredients-section"><i class="ti ti-leaf"></i><span
-            class="nav-text">Ingrédients</span></a></li>
+            class="nav-text">IngrÃ©dients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Gérer les plans</span></a></li>
+            class="nav-text">GÃ©rer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Créer un plan</span></a></li>
+            class="nav-text">CrÃ©er un plan</span></a></li>
       <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span
             class="nav-text">Objectifs</span></a></li>
 
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
+      <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+      <li><a class="nav-link" href="post_list.php"><i class="ti ti-article"></i><span
+            class="nav-text">Posts</span></a></li>
+      <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message"></i><span
+            class="nav-text">Commentaires</span></a></li>
+
+            <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a>
       </li>
     </ul>
 
@@ -157,7 +174,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         <div class="col-12">
           <div class="mb-6">
             <h1 class="fs-3 mb-1">Gestion des Utilisateurs</h1>
-            <p>Afficher et gérer tous les utilisateurs enregistrés</p>
+            <p>Afficher et gÃ©rer tous les utilisateurs enregistrÃ©s</p>
           </div>
         </div>
       </div>
@@ -186,8 +203,8 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                   <thead class="table-light">
                     <tr>
                       <th>Utilisateur</th>
-                      <th>Courrier Électronique</th>
-                      <th>Rôle</th>
+                      <th>Courrier Ã‰lectronique</th>
+                      <th>RÃ´le</th>
                       <th>Statut</th>
                       <th>Date d'Inscription</th>
                       <th>Actions</th>
@@ -220,7 +237,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         <div class="col-12">
           <div class="card border-primary">
             <div class="card-header bg-gradient d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-              <h5 class="mb-0 text-white">🤖 AI Email Campaign System</h5>
+              <h5 class="mb-0 text-white">ðŸ¤– AI Email Campaign System</h5>
               <button id="toggleCampaignBtn" class="btn btn-light btn-sm">
                 <i class="ti ti-chevron-down"></i>
               </button>
@@ -229,44 +246,44 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
               <div class="row g-3">
                 <!-- Segment Selection -->
                 <div class="col-md-6">
-                  <label class="form-label fw-bold">1️⃣ Select User Segment</label>
+                  <label class="form-label fw-bold">1ï¸âƒ£ Select User Segment</label>
                   <select id="segmentSelect" class="form-select">
                     <option value="">-- Select Segment --</option>
-                    <option value="super_active">🔥 Super Active Users</option>
-                    <option value="vip">⭐ VIP Users (Admins)</option>
-                    <option value="new_users">🆕 New Users (< 7 days)</option>
-                    <option value="dormant">💤 Dormant Users (14-30 days)</option>
-                    <option value="at_risk">⚠️ At Risk (30+ days inactive)</option>
-                    <option value="incomplete_profile">📝 Incomplete Profiles</option>
-                    <option value="allergy_alert">🚨 Users with Allergies</option>
-                    <option value="all">👥 All Users</option>
+                    <option value="super_active">ðŸ”¥ Super Active Users</option>
+                    <option value="vip">â­ VIP Users (Admins)</option>
+                    <option value="new_users">ðŸ†• New Users (< 7 days)</option>
+                    <option value="dormant">ðŸ’¤ Dormant Users (14-30 days)</option>
+                    <option value="at_risk">âš ï¸ At Risk (30+ days inactive)</option>
+                    <option value="incomplete_profile">ðŸ“ Incomplete Profiles</option>
+                    <option value="allergy_alert">ðŸš¨ Users with Allergies</option>
+                    <option value="all">ðŸ‘¥ All Users</option>
                   </select>
                   <div id="segmentInfo" class="mt-2 small text-muted"></div>
                 </div>
 
                 <!-- Template Selection -->
                 <div class="col-md-6">
-                  <label class="form-label fw-bold">2️⃣ Select Email Template</label>
+                  <label class="form-label fw-bold">2ï¸âƒ£ Select Email Template</label>
                   <select id="templateSelect" class="form-select">
-                    <option value="welcome">🎉 Welcome Email</option>
-                    <option value="reengagement">🔥 Re-engagement</option>
-                    <option value="profile_completion">📝 Profile Completion</option>
-                    <option value="health_milestone">💪 Health Milestone</option>
-                    <option value="allergy_alert">⚠️ Allergy Safety Alert</option>
-                    <option value="birthday">🎂 Birthday Wishes</option>
-                    <option value="progress_report">📊 Progress Report</option>
-                    <option value="tips">💡 Health Tips</option>
+                    <option value="welcome">ðŸŽ‰ Welcome Email</option>
+                    <option value="reengagement">ðŸ”¥ Re-engagement</option>
+                    <option value="profile_completion">ðŸ“ Profile Completion</option>
+                    <option value="health_milestone">ðŸ’ª Health Milestone</option>
+                    <option value="allergy_alert">âš ï¸ Allergy Safety Alert</option>
+                    <option value="birthday">ðŸŽ‚ Birthday Wishes</option>
+                    <option value="progress_report">ðŸ“Š Progress Report</option>
+                    <option value="tips">ðŸ’¡ Health Tips</option>
                   </select>
                 </div>
 
                 <!-- Tone Selection -->
                 <div class="col-md-6">
-                  <label class="form-label fw-bold">3️⃣ Email Tone</label>
+                  <label class="form-label fw-bold">3ï¸âƒ£ Email Tone</label>
                   <select id="toneSelect" class="form-select">
-                    <option value="friendly">😊 Friendly</option>
-                    <option value="professional">👔 Professional</option>
-                    <option value="motivational">💪 Motivational</option>
-                    <option value="caring">💚 Caring</option>
+                    <option value="friendly">ðŸ˜Š Friendly</option>
+                    <option value="professional">ðŸ‘” Professional</option>
+                    <option value="motivational">ðŸ’ª Motivational</option>
+                    <option value="caring">ðŸ’š Caring</option>
                   </select>
                 </div>
 
@@ -284,7 +301,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
               <!-- User Selection Section -->
               <div id="userSelectionSection" class="mt-4" style="display: none;">
                 <hr>
-                <h6 class="fw-bold mb-3">👥 Select Users to Email</h6>
+                <h6 class="fw-bold mb-3">ðŸ‘¥ Select Users to Email</h6>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                   <div>
                     <button id="selectAllUsersBtn" class="btn btn-sm btn-outline-primary">
@@ -311,7 +328,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
               <!-- Preview Section -->
               <div id="emailPreviewSection" class="mt-4" style="display: none;">
                 <hr>
-                <h6 class="fw-bold mb-3">📧 Email Preview & Send</h6>
+                <h6 class="fw-bold mb-3">ðŸ“§ Email Preview & Send</h6>
                 <div id="emailPreviewContainer"></div>
               </div>
             </div>
@@ -382,11 +399,11 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         modal.innerHTML = `
             <div class="logout-modal">
                 <div class="logout-modal-content">
-                    <h3>Confirmation de Déconnexion</h3>
-                    <p>Êtes-vous sûr de vouloir vous déconnecter?</p>
+                    <h3>Confirmation de DÃ©connexion</h3>
+                    <p>ÃŠtes-vous sÃ»r de vouloir vous dÃ©connecter?</p>
                     <div class="logout-modal-buttons">
                         <button class="logout-btn-cancel">Annuler</button>
-                        <button class="logout-btn-confirm">Déconnexion</button>
+                        <button class="logout-btn-confirm">DÃ©connexion</button>
                     </div>
                 </div>
             </div>
@@ -433,8 +450,8 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             <div class="delete-modal">
                 <div class="delete-modal-content">
                     <h3>Confirmation de Suppression</h3>
-                    <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>${userName}</strong> ?</p>
-                    <p class="text-danger small">Cette action est irréversible.</p>
+                    <p>ÃŠtes-vous sÃ»r de vouloir supprimer l'utilisateur <strong>${userName}</strong> ?</p>
+                    <p class="text-danger small">Cette action est irrÃ©versible.</p>
                     <div class="delete-modal-buttons">
                         <button class="delete-btn-cancel">Annuler</button>
                         <button class="delete-btn-confirm" data-user-id="${userId}">Supprimer</button>
@@ -492,9 +509,9 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         modal.innerHTML = `
             <div class="block-modal">
                 <div class="block-modal-content">
-                    <h3>🔒 Bloquer l'utilisateur</h3>
-                    <p>Êtes-vous sûr de vouloir bloquer <strong>${userName}</strong> ?</p>
-                    <p class="text-warning small">L'utilisateur ne pourra plus se connecter à son compte.</p>
+                    <h3>ðŸ”’ Bloquer l'utilisateur</h3>
+                    <p>ÃŠtes-vous sÃ»r de vouloir bloquer <strong>${userName}</strong> ?</p>
+                    <p class="text-warning small">L'utilisateur ne pourra plus se connecter Ã  son compte.</p>
                     <div class="block-modal-buttons">
                         <button class="block-btn-cancel">Annuler</button>
                         <button class="block-btn-confirm" data-user-id="${userId}">Bloquer</button>
@@ -551,12 +568,12 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         modal.innerHTML = `
             <div class="block-modal">
                 <div class="block-modal-content">
-                    <h3>🔓 Débloquer l'utilisateur</h3>
-                    <p>Êtes-vous sûr de vouloir débloquer <strong>${userName}</strong> ?</p>
-                    <p class="text-success small">L'utilisateur pourra à nouveau se connecter à son compte.</p>
+                    <h3>ðŸ”“ DÃ©bloquer l'utilisateur</h3>
+                    <p>ÃŠtes-vous sÃ»r de vouloir dÃ©bloquer <strong>${userName}</strong> ?</p>
+                    <p class="text-success small">L'utilisateur pourra Ã  nouveau se connecter Ã  son compte.</p>
                     <div class="block-modal-buttons">
                         <button class="block-btn-cancel">Annuler</button>
-                        <button class="block-btn-confirm-success" data-user-id="${userId}">Débloquer</button>
+                        <button class="block-btn-confirm-success" data-user-id="${userId}">DÃ©bloquer</button>
                     </div>
                 </div>
             </div>
@@ -599,7 +616,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         })
         .catch(error => {
             console.error('Unblock error:', error);
-            alert('Une erreur est survenue lors du déblocage');
+            alert('Une erreur est survenue lors du dÃ©blocage');
         });
     }
 
@@ -653,11 +670,11 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             if (bmi < 18.5) { bmiCategory = 'Insuffisant'; bmiColor = 'warning'; }
             else if (bmi < 25) { bmiCategory = 'Normal'; bmiColor = 'success'; }
             else if (bmi < 30) { bmiCategory = 'Surpoids'; bmiColor = 'warning'; }
-            else { bmiCategory = 'Obésité'; bmiColor = 'danger'; }
+            else { bmiCategory = 'ObÃ©sitÃ©'; bmiColor = 'danger'; }
             
             bmiHtml = `<span class="badge bg-${bmiColor}">${bmi} - ${bmiCategory}</span>`;
         } else {
-            bmiHtml = '<span class="text-muted">Non calculé</span>';
+            bmiHtml = '<span class="text-muted">Non calculÃ©</span>';
         }
 
         // Profile completion
@@ -701,7 +718,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                         </div>
                         <div class="col-md-4">
                             <div class="stat-card">
-                                <div class="stat-label">Profil Complété</div>
+                                <div class="stat-label">Profil ComplÃ©tÃ©</div>
                                 <div class="stat-value">${profileCompletion}%</div>
                             </div>
                         </div>
@@ -732,7 +749,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-activity">
-                                <i class="ti ti-activity"></i> Activité
+                                <i class="ti ti-activity"></i> ActivitÃ©
                             </button>
                         </li>
                         <li class="nav-item">
@@ -742,7 +759,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-ai-insights">
-                                <i class="ti ti-sparkles"></i> 🤖 AI Insights
+                                <i class="ti ti-sparkles"></i> ðŸ¤– AI Insights
                             </button>
                         </li>
                     </ul>
@@ -796,7 +813,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         return `
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Rôle</div>
+                    <div class="info-label">RÃ´le</div>
                     <div class="info-value">
                         <span class="role-badge role-${user.role.toLowerCase()}">
                             ${user.role === 'admin' ? 'Administrateur' : 'Utilisateur'}
@@ -807,28 +824,28 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                     <div class="info-label">Statut</div>
                     <div class="info-value">
                         ${user.status === 'blocked' ? 
-                            '<span class="badge bg-danger">🔒 Bloqué</span>' : 
-                            '<span class="badge bg-success">✓ Actif</span>'}
+                            '<span class="badge bg-danger">ðŸ”’ BloquÃ©</span>' : 
+                            '<span class="badge bg-success">âœ“ Actif</span>'}
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Âge</div>
-                    <div class="info-value">${user.age || '<span class="text-muted">Non renseigné</span>'}</div>
+                    <div class="info-label">Ã‚ge</div>
+                    <div class="info-value">${user.age || '<span class="text-muted">Non renseignÃ©</span>'}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Poids</div>
-                    <div class="info-value">${user.poids ? user.poids + ' kg' : '<span class="text-muted">Non renseigné</span>'}</div>
+                    <div class="info-value">${user.poids ? user.poids + ' kg' : '<span class="text-muted">Non renseignÃ©</span>'}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Taille</div>
-                    <div class="info-value">${user.taille ? user.taille + ' cm' : '<span class="text-muted">Non renseigné</span>'}</div>
+                    <div class="info-value">${user.taille ? user.taille + ' cm' : '<span class="text-muted">Non renseignÃ©</span>'}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Allergies</div>
                     <div class="info-value">
                         ${user.allergique == 1 ? 
-                            '<span class="badge bg-warning">⚠️ Oui</span>' : 
-                            '<span class="badge bg-success">✓ Non</span>'}
+                            '<span class="badge bg-warning">âš ï¸ Oui</span>' : 
+                            '<span class="badge bg-success">âœ“ Non</span>'}
                     </div>
                 </div>
                 <div class="info-item">
@@ -836,7 +853,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                     <div class="info-value">${new Date(user.date_creation).toLocaleDateString('fr-FR')}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Dernière connexion</div>
+                    <div class="info-label">DerniÃ¨re connexion</div>
                     <div class="info-value">
                         ${user.last_login ? new Date(user.last_login).toLocaleString('fr-FR') : '<span class="text-muted">Jamais</span>'}
                     </div>
@@ -851,10 +868,10 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="form-label mb-0 fw-bold">Ajouter une note</label>
                     <button class="btn btn-sm btn-outline-primary" onclick="getAINoteSuggestions(${userId})">
-                        <i class="ti ti-sparkles"></i> 🤖 Suggestions AI
+                        <i class="ti ti-sparkles"></i> ðŸ¤– Suggestions AI
                     </button>
                 </div>
-                <textarea id="newNoteText" class="form-control" rows="3" placeholder="Ajouter une note privée..."></textarea>
+                <textarea id="newNoteText" class="form-control" rows="3" placeholder="Ajouter une note privÃ©e..."></textarea>
                 <div id="aiNoteSuggestions" class="mt-2" style="display: none;"></div>
                 <button class="btn btn-primary btn-sm mt-2" onclick="addNote(${userId})">
                     <i class="ti ti-plus"></i> Ajouter Note
@@ -894,7 +911,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="form-label mb-0 fw-bold">Ajouter un tag</label>
                     <button class="btn btn-sm btn-outline-primary" onclick="getAITagRecommendations(${userId})">
-                        <i class="ti ti-sparkles"></i> 🤖 Recommandations AI
+                        <i class="ti ti-sparkles"></i> ðŸ¤– Recommandations AI
                     </button>
                 </div>
                 <div id="aiTagRecommendations" class="mb-3" style="display: none;"></div>
@@ -933,7 +950,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <div class="stat-card-small">
-                        <div class="stat-label-small">Total Activités</div>
+                        <div class="stat-label-small">Total ActivitÃ©s</div>
                         <div class="stat-value-small">${stats.total_activities}</div>
                     </div>
                 </div>
@@ -945,7 +962,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 </div>
                 <div class="col-md-4">
                     <div class="stat-card-small">
-                        <div class="stat-label-small">Plus Fréquent</div>
+                        <div class="stat-label-small">Plus FrÃ©quent</div>
                         <div class="stat-value-small small">${stats.most_common_activity}</div>
                     </div>
                 </div>
@@ -954,7 +971,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         `;
 
         if (activities.length === 0) {
-            html += '<p class="text-muted text-center py-4">Aucune activité enregistrée</p>';
+            html += '<p class="text-muted text-center py-4">Aucune activitÃ© enregistrÃ©e</p>';
         } else {
             activities.forEach(activity => {
                 const date = new Date(activity.created_at);
@@ -962,7 +979,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 
                 html += `
                     <div class="activity-item">
-                        <div class="activity-icon">●</div>
+                        <div class="activity-icon">â—</div>
                         <div class="activity-content">
                             <div class="activity-type">${escapeHtml(activity.activity_type)}</div>
                             ${activity.activity_description ? `<div class="activity-desc">${escapeHtml(activity.activity_description)}</div>` : ''}
@@ -981,19 +998,19 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         let html = '<div class="emails-list">';
 
         if (emails.length === 0) {
-            html += '<p class="text-muted text-center py-4">Aucun email envoyé</p>';
+            html += '<p class="text-muted text-center py-4">Aucun email envoyÃ©</p>';
         } else {
             emails.forEach(email => {
                 const statusBadge = email.status === 'sent' ? 
-                    '<span class="badge bg-success">Envoyé</span>' : 
-                    '<span class="badge bg-danger">Échec</span>';
+                    '<span class="badge bg-success">EnvoyÃ©</span>' : 
+                    '<span class="badge bg-danger">Ã‰chec</span>';
                 
                 html += `
                     <div class="email-item">
                         <div class="email-header">
                             <strong>${escapeHtml(email.subject)}</strong>
                             ${statusBadge}
-                            ${email.ai_generated == 1 ? '<span class="badge bg-primary ms-2">🤖 AI</span>' : ''}
+                            ${email.ai_generated == 1 ? '<span class="badge bg-primary ms-2">ðŸ¤– AI</span>' : ''}
                         </div>
                         <div class="email-meta">
                             <span class="text-muted small">${new Date(email.sent_at).toLocaleString('fr-FR')}</span>
@@ -1011,7 +1028,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     function getTimeAgo(date) {
         const seconds = Math.floor((new Date() - date) / 1000);
         
-        if (seconds < 60) return 'À l\'instant';
+        if (seconds < 60) return 'Ã€ l\'instant';
         if (seconds < 3600) return Math.floor(seconds / 60) + ' min';
         if (seconds < 86400) return Math.floor(seconds / 3600) + ' h';
         if (seconds < 604800) return Math.floor(seconds / 86400) + ' j';
@@ -1112,14 +1129,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         return `
             <div class="ai-insights-container">
                 <div class="text-center mb-4">
-                    <h5 class="mb-3">🤖 Intelligence Artificielle</h5>
+                    <h5 class="mb-3">ðŸ¤– Intelligence Artificielle</h5>
                     <p class="text-muted">Utilisez l'IA pour obtenir des insights approfondis sur cet utilisateur</p>
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <button class="btn btn-primary w-100" onclick="generateUserInsights(${userId})">
-                            <i class="ti ti-brain"></i> Générer Insights Complets
+                            <i class="ti ti-brain"></i> GÃ©nÃ©rer Insights Complets
                         </button>
                     </div>
                     <div class="col-md-6">
@@ -1129,7 +1146,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-warning w-100" onclick="generateProfileSummary(${userId})">
-                            <i class="ti ti-file-text"></i> Résumé du Profil
+                            <i class="ti ti-file-text"></i> RÃ©sumÃ© du Profil
                         </button>
                     </div>
                     <div class="col-md-6">
@@ -1142,7 +1159,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 <div id="aiInsightsResults" class="ai-results-container">
                     <div class="text-center text-muted py-5">
                         <i class="ti ti-sparkles" style="font-size: 48px;"></i>
-                        <p class="mt-3">Cliquez sur un bouton ci-dessus pour générer des insights AI</p>
+                        <p class="mt-3">Cliquez sur un bouton ci-dessus pour gÃ©nÃ©rer des insights AI</p>
                     </div>
                 </div>
             </div>
@@ -1152,7 +1169,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     // Generate User Insights
     function generateUserInsights(userId) {
         const resultsDiv = document.getElementById('aiInsightsResults');
-        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Génération des insights AI...</p></div>';
+        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">GÃ©nÃ©ration des insights AI...</p></div>';
 
         fetch(`../../controllers/UserController.php?action=generate_user_insights&user_id=${userId}`)
             .then(response => response.json())
@@ -1166,13 +1183,13 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                             <h5 class="mb-3"><i class="ti ti-brain"></i> Insights Utilisateur</h5>
                             
                             <div class="insight-section">
-                                <h6 class="text-primary">📊 Résumé</h6>
-                                <p>${insights.summary || 'Aucun résumé disponible'}</p>
+                                <h6 class="text-primary">ðŸ“Š RÃ©sumÃ©</h6>
+                                <p>${insights.summary || 'Aucun rÃ©sumÃ© disponible'}</p>
                             </div>
 
                             ${insights.strengths && insights.strengths.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-success">💪 Points Forts</h6>
+                                    <h6 class="text-success">ðŸ’ª Points Forts</h6>
                                     <ul>
                                         ${insights.strengths.map(s => `<li>${s}</li>`).join('')}
                                     </ul>
@@ -1181,14 +1198,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${insights.engagement_analysis ? `
                                 <div class="insight-section">
-                                    <h6 class="text-info">📈 Analyse d'Engagement</h6>
+                                    <h6 class="text-info">ðŸ“ˆ Analyse d'Engagement</h6>
                                     <p>${insights.engagement_analysis}</p>
                                 </div>
                             ` : ''}
 
                             ${insights.recommendations && insights.recommendations.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-warning">💡 Recommandations</h6>
+                                    <h6 class="text-warning">ðŸ’¡ Recommandations</h6>
                                     <ul>
                                         ${insights.recommendations.map(r => `<li>${r}</li>`).join('')}
                                     </ul>
@@ -1197,14 +1214,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${insights.health_insights ? `
                                 <div class="insight-section">
-                                    <h6 class="text-danger">🏥 Insights Santé</h6>
+                                    <h6 class="text-danger">ðŸ¥ Insights SantÃ©</h6>
                                     <p>${insights.health_insights}</p>
                                 </div>
                             ` : ''}
 
                             ${insights.risk_factors && insights.risk_factors.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-danger">⚠️ Facteurs de Risque</h6>
+                                    <h6 class="text-danger">âš ï¸ Facteurs de Risque</h6>
                                     <ul>
                                         ${insights.risk_factors.map(r => `<li>${r}</li>`).join('')}
                                     </ul>
@@ -1213,7 +1230,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${insights.next_actions && insights.next_actions.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-secondary">🎯 Actions Suivantes</h6>
+                                    <h6 class="text-secondary">ðŸŽ¯ Actions Suivantes</h6>
                                     <ul>
                                         ${insights.next_actions.map(a => `<li>${a}</li>`).join('')}
                                     </ul>
@@ -1223,7 +1240,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                     `;
                 } else {
                     console.error('AI Insights Error:', data);
-                    resultsDiv.innerHTML = '<div class="alert alert-danger">Erreur: ' + (data.error || data.message || 'Impossible de générer les insights') + '</div>';
+                    resultsDiv.innerHTML = '<div class="alert alert-danger">Erreur: ' + (data.error || data.message || 'Impossible de gÃ©nÃ©rer les insights') + '</div>';
                 }
             })
             .catch(error => {
@@ -1236,14 +1253,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     function getAINoteSuggestions(userId) {
         const suggestionsDiv = document.getElementById('aiNoteSuggestions');
         suggestionsDiv.style.display = 'block';
-        suggestionsDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm"></div> Génération de suggestions...</div>';
+        suggestionsDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm"></div> GÃ©nÃ©ration de suggestions...</div>';
 
         fetch(`../../controllers/UserController.php?action=get_ai_note_suggestions&user_id=${userId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data) {
                     const suggestions = data.data;
-                    let html = '<div class="alert alert-info"><strong>🤖 Suggestions AI:</strong><ul class="mb-0 mt-2">';
+                    let html = '<div class="alert alert-info"><strong>ðŸ¤– Suggestions AI:</strong><ul class="mb-0 mt-2">';
                     suggestions.forEach(suggestion => {
                         html += `<li style="cursor: pointer;" onclick="document.getElementById('newNoteText').value = '${escapeHtml(suggestion).replace(/'/g, "\\'")}'">${suggestion}</li>`;
                     });
@@ -1262,14 +1279,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     function getAITagRecommendations(userId) {
         const recommendationsDiv = document.getElementById('aiTagRecommendations');
         recommendationsDiv.style.display = 'block';
-        recommendationsDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm"></div> Génération de recommandations...</div>';
+        recommendationsDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm"></div> GÃ©nÃ©ration de recommandations...</div>';
 
         fetch(`../../controllers/UserController.php?action=get_ai_tag_recommendations&user_id=${userId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data) {
                     const recommendations = data.data;
-                    let html = '<div class="alert alert-info"><strong>🤖 Recommandations AI:</strong><div class="mt-2">';
+                    let html = '<div class="alert alert-info"><strong>ðŸ¤– Recommandations AI:</strong><div class="mt-2">';
                     recommendations.forEach(rec => {
                         html += `
                             <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
@@ -1327,7 +1344,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                             
                             ${analysis.patterns && analysis.patterns.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-primary">🔍 Patterns Détectés</h6>
+                                    <h6 class="text-primary">ðŸ” Patterns DÃ©tectÃ©s</h6>
                                     <ul>
                                         ${analysis.patterns.map(p => `<li>${p}</li>`).join('')}
                                     </ul>
@@ -1336,21 +1353,21 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${analysis.insights ? `
                                 <div class="insight-section">
-                                    <h6 class="text-info">💡 Insights Clés</h6>
+                                    <h6 class="text-info">ðŸ’¡ Insights ClÃ©s</h6>
                                     <p>${analysis.insights}</p>
                                 </div>
                             ` : ''}
 
                             ${analysis.predictions ? `
                                 <div class="insight-section">
-                                    <h6 class="text-success">🔮 Prédictions</h6>
+                                    <h6 class="text-success">ðŸ”® PrÃ©dictions</h6>
                                     <p>${analysis.predictions}</p>
                                 </div>
                             ` : ''}
 
                             ${analysis.concerns ? `
                                 <div class="insight-section">
-                                    <h6 class="text-warning">⚠️ Points d'Attention</h6>
+                                    <h6 class="text-warning">âš ï¸ Points d'Attention</h6>
                                     <p>${analysis.concerns}</p>
                                 </div>
                             ` : ''}
@@ -1370,7 +1387,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     // Generate Health Recommendations
     function generateHealthRecommendations(userId) {
         const resultsDiv = document.getElementById('aiInsightsResults');
-        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Génération des recommandations santé...</p></div>';
+        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">GÃ©nÃ©ration des recommandations santÃ©...</p></div>';
 
         fetch(`../../controllers/UserController.php?action=generate_health_recommendations&user_id=${userId}`)
             .then(response => response.json())
@@ -1379,20 +1396,20 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                     const health = data.data;
                     resultsDiv.innerHTML = `
                         <div class="ai-result-card">
-                            <h5 class="mb-3"><i class="ti ti-heart"></i> Recommandations Santé</h5>
+                            <h5 class="mb-3"><i class="ti ti-heart"></i> Recommandations SantÃ©</h5>
                             
                             <div class="insight-section">
-                                <h6 class="text-primary">📊 Catégorie IMC</h6>
+                                <h6 class="text-primary">ðŸ“Š CatÃ©gorie IMC</h6>
                                 <p><strong>${health.bmi_category}</strong></p>
                             </div>
 
                             <div class="insight-section">
-                                <h6 class="text-info">🏥 État de Santé</h6>
+                                <h6 class="text-info">ðŸ¥ Ã‰tat de SantÃ©</h6>
                                 <p>${health.health_status}</p>
                             </div>
 
                             <div class="insight-section">
-                                <h6 class="text-success">💡 Recommandations</h6>
+                                <h6 class="text-success">ðŸ’¡ Recommandations</h6>
                                 <ul>
                                     ${health.recommendations.map(r => `<li>${r}</li>`).join('')}
                                 </ul>
@@ -1400,7 +1417,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${health.nutrition_tips && health.nutrition_tips.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-warning">🍎 Conseils Nutrition</h6>
+                                    <h6 class="text-warning">ðŸŽ Conseils Nutrition</h6>
                                     <ul>
                                         ${health.nutrition_tips.map(t => `<li>${t}</li>`).join('')}
                                     </ul>
@@ -1409,7 +1426,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${health.exercise_suggestions && health.exercise_suggestions.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-primary">🏃 Suggestions d'Exercice</h6>
+                                    <h6 class="text-primary">ðŸƒ Suggestions d'Exercice</h6>
                                     <ul>
                                         ${health.exercise_suggestions.map(s => `<li>${s}</li>`).join('')}
                                     </ul>
@@ -1418,7 +1435,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
                             ${health.warnings && health.warnings.length > 0 ? `
                                 <div class="insight-section">
-                                    <h6 class="text-danger">⚠️ Avertissements</h6>
+                                    <h6 class="text-danger">âš ï¸ Avertissements</h6>
                                     <ul>
                                         ${health.warnings.map(w => `<li>${w}</li>`).join('')}
                                     </ul>
@@ -1427,7 +1444,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                         </div>
                     `;
                 } else {
-                    resultsDiv.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error || 'Impossible de générer les recommandations'}</div>`;
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error || 'Impossible de gÃ©nÃ©rer les recommandations'}</div>`;
                 }
             })
             .catch(error => {
@@ -1438,7 +1455,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     // Generate Profile Summary
     function generateProfileSummary(userId) {
         const resultsDiv = document.getElementById('aiInsightsResults');
-        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Génération du résumé...</p></div>';
+        resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">GÃ©nÃ©ration du rÃ©sumÃ©...</p></div>';
 
         fetch(`../../controllers/UserController.php?action=generate_profile_summary&user_id=${userId}`)
             .then(response => response.json())
@@ -1446,14 +1463,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 if (data.success && data.summary) {
                     resultsDiv.innerHTML = `
                         <div class="ai-result-card">
-                            <h5 class="mb-3"><i class="ti ti-file-text"></i> Résumé du Profil</h5>
+                            <h5 class="mb-3"><i class="ti ti-file-text"></i> RÃ©sumÃ© du Profil</h5>
                             <div class="alert alert-primary">
                                 <p class="mb-0" style="font-size: 16px; line-height: 1.6;">${data.summary}</p>
                             </div>
                         </div>
                     `;
                 } else {
-                    resultsDiv.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error || 'Impossible de générer le résumé'}</div>`;
+                    resultsDiv.innerHTML = `<div class="alert alert-danger">Erreur: ${data.error || 'Impossible de gÃ©nÃ©rer le rÃ©sumÃ©'}</div>`;
                 }
             })
             .catch(error => {
@@ -1543,7 +1560,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         tableBody.innerHTML = `
           <tr>
             <td colspan="6" class="text-center py-4">
-              <p class="text-muted mb-0">Aucun utilisateur trouvé</p>
+              <p class="text-muted mb-0">Aucun utilisateur trouvÃ©</p>
             </td>
           </tr>
         `;
@@ -1560,12 +1577,12 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         // Status badge and button
         const isBlocked = user.status === 'blocked';
         const statusBadge = isBlocked ? 
-          '<span class="badge bg-danger">🔒 Bloqué</span>' : 
-          '<span class="badge bg-success">✓ Actif</span>';
+          '<span class="badge bg-danger">ðŸ”’ BloquÃ©</span>' : 
+          '<span class="badge bg-success">âœ“ Actif</span>';
         
         const actionButton = isBlocked ?
           `<button class="btn btn-sm btn-success me-2" onclick="unblockUser(${user.id}, '${escapeHtml(user.nom)}')">
-            <i class="ti ti-lock-open"></i> Débloquer
+            <i class="ti ti-lock-open"></i> DÃ©bloquer
           </button>` :
           `<button class="btn btn-sm btn-warning me-2" onclick="blockUser(${user.id}, '${escapeHtml(user.nom)}')">
             <i class="ti ti-lock"></i> Bloquer
@@ -1619,7 +1636,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
       paginationHTML += `
         <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
           <a class="page-link" href="#" onclick="loadUsers(${pagination.current_page - 1}, currentSearch); return false;">
-            Précédent
+            PrÃ©cÃ©dent
           </a>
         </li>
       `;
@@ -1760,8 +1777,8 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
           <thead>
             <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
               <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; border-right: 1px solid rgba(255,255,255,0.2); width: 25%;">UTILISATEUR</th>
-              <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; border-right: 1px solid rgba(255,255,255,0.2); width: 35%;">COURRIER ÉLECTRONIQUE</th>
-              <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; border-right: 1px solid rgba(255,255,255,0.2); width: 20%;">RÔLE</th>
+              <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; border-right: 1px solid rgba(255,255,255,0.2); width: 35%;">COURRIER Ã‰LECTRONIQUE</th>
+              <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; border-right: 1px solid rgba(255,255,255,0.2); width: 20%;">RÃ”LE</th>
               <th style="padding: 16px 12px; text-align: left; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; width: 20%;">DATE D'INSCRIPTION</th>
             </tr>
           </thead>
@@ -1813,7 +1830,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             <h2 style="color: rgba(255,255,255,0.95); font-size: 20px; margin: 5px 0 15px 0; font-weight: 400; letter-spacing: 0.5px;">Liste des Utilisateurs</h2>
             <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px;">
               <p style="color: white; font-size: 11px; margin: 0; font-weight: 500;">
-                📅 Généré le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                ðŸ“… GÃ©nÃ©rÃ© le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })} Ã  ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
@@ -1849,7 +1866,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         <div style="text-align: center; margin-top: 40px; padding-top: 25px; border-top: 2px solid #e9ecef;">
           <div style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 30px; border-radius: 30px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
             <p style="margin: 0; color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;">
-              © 2024 NUTRIMIND - Tous droits réservés | Système de Gestion Nutritionnelle
+              Â© 2024 NUTRIMIND - Tous droits rÃ©servÃ©s | SystÃ¨me de Gestion Nutritionnelle
             </p>
           </div>
           <p style="margin: 15px 0 0 0; color: #95a5a6; font-size: 10px; font-style: italic;">
@@ -2149,9 +2166,9 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
                 </div>
               </div>
               ${success ? `
-                <span class="badge bg-success">✓ Generated</span>
+                <span class="badge bg-success">âœ“ Generated</span>
               ` : `
-                <span class="badge bg-danger">✗ Failed</span>
+                <span class="badge bg-danger">âœ— Failed</span>
               `}
             </div>
             
@@ -2181,7 +2198,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             ` : `
               <div class="email-preview-body">
                 <div class="alert alert-danger mb-3">
-                  <strong>❌ Generation Failed</strong><br>
+                  <strong>âŒ Generation Failed</strong><br>
                   <span class="small">${email.error || 'Unknown error'}</span>
                   ${email.http_code ? `<br><span class="small text-muted">HTTP Code: ${email.http_code}</span>` : ''}
                 </div>
@@ -2275,7 +2292,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
       const subject = emailData.email_data.subject;
       const body = emailData.email_data.body;
       
-      if (!confirm(`Envoyer l'email à ${emailData.user_name} (${emailData.user_email})?`)) {
+      if (!confirm(`Envoyer l'email Ã  ${emailData.user_name} (${emailData.user_email})?`)) {
         return;
       }
       
@@ -2297,25 +2314,25 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         
         if (data.success) {
           // Success notification
-          btn.innerHTML = '<i class="ti ti-check"></i> Envoyé!';
+          btn.innerHTML = '<i class="ti ti-check"></i> EnvoyÃ©!';
           btn.classList.remove('btn-success');
           btn.classList.add('btn-secondary');
           btn.disabled = true;
           
           // Show success notification
-          showNotification('✅ Email envoyé avec succès!', `L'email a été envoyé à ${emailData.user_name} (${emailData.user_email})`, 'success');
+          showNotification('âœ… Email envoyÃ© avec succÃ¨s!', `L'email a Ã©tÃ© envoyÃ© Ã  ${emailData.user_name} (${emailData.user_email})`, 'success');
         } else {
           btn.disabled = false;
           btn.innerHTML = originalHTML;
           console.error('Error response:', data); // Debug log
-          showNotification('❌ Erreur', data.message || (data.errors ? data.errors.join(', ') : 'Erreur lors de l\'envoi'), 'error');
+          showNotification('âŒ Erreur', data.message || (data.errors ? data.errors.join(', ') : 'Erreur lors de l\'envoi'), 'error');
         }
       })
       .catch(error => {
         btn.disabled = false;
         btn.innerHTML = originalHTML;
         console.error('Fetch error:', error);
-        showNotification('❌ Erreur', 'Une erreur s\'est produite lors de l\'envoi de l\'email', 'error');
+        showNotification('âŒ Erreur', 'Une erreur s\'est produite lors de l\'envoi de l\'email', 'error');
       });
     }
 
@@ -2345,7 +2362,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             <strong style="display: block; margin-bottom: 5px; font-size: 14px;">${title}</strong>
             <p style="margin: 0; font-size: 13px; line-height: 1.4;">${message}</p>
           </div>
-          <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: inherit; padding: 0; line-height: 1;">×</button>
+          <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: inherit; padding: 0; line-height: 1;">Ã—</button>
         </div>
       `;
       
@@ -2387,7 +2404,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     function sendAllEmails() {
       const successEmails = generatedEmails.filter(e => e.email_data.success);
       
-      if (!confirm(`Envoyer ${successEmails.length} emails personnalisés?`)) {
+      if (!confirm(`Envoyer ${successEmails.length} emails personnalisÃ©s?`)) {
         return;
       }
       
@@ -2408,13 +2425,13 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
           const successCount = data.results.filter(r => r.success).length;
           const failedCount = data.results.length - successCount;
           
-          btn.innerHTML = '<i class="ti ti-check"></i> Tous envoyés!';
+          btn.innerHTML = '<i class="ti ti-check"></i> Tous envoyÃ©s!';
           btn.classList.add('btn-secondary');
           
           // Show success notification
           showNotification(
-            '✅ Emails envoyés!', 
-            `${successCount} email(s) envoyé(s) avec succès${failedCount > 0 ? `, ${failedCount} échec(s)` : ''}`, 
+            'âœ… Emails envoyÃ©s!', 
+            `${successCount} email(s) envoyÃ©(s) avec succÃ¨s${failedCount > 0 ? `, ${failedCount} Ã©chec(s)` : ''}`, 
             'success'
           );
           
@@ -2425,14 +2442,14 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         } else {
           btn.disabled = false;
           btn.innerHTML = '<i class="ti ti-send"></i> Envoyer tous les emails';
-          showNotification('❌ Erreur', data.message || (data.errors ? data.errors.join(', ') : 'Erreur lors de l\'envoi'), 'error');
+          showNotification('âŒ Erreur', data.message || (data.errors ? data.errors.join(', ') : 'Erreur lors de l\'envoi'), 'error');
         }
       })
       .catch(error => {
         btn.disabled = false;
         btn.innerHTML = '<i class="ti ti-send"></i> Envoyer tous les emails';
         console.error('Error:', error);
-        showNotification('❌ Erreur', 'Une erreur s\'est produite lors de l\'envoi des emails', 'error');
+        showNotification('âŒ Erreur', 'Une erreur s\'est produite lors de l\'envoi des emails', 'error');
       });
     }
 
@@ -2466,7 +2483,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
             '<span class="badge bg-success">Sent</span>' : 
             '<span class="badge bg-danger">Failed</span>';
           const aiBadge = item.ai_generated == 1 ? 
-            '<span class="badge bg-primary">🤖 AI</span>' : 
+            '<span class="badge bg-primary">ðŸ¤– AI</span>' : 
             '<span class="badge bg-secondary">Manual</span>';
           
           historyHTML += `
@@ -2487,7 +2504,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         <div class="campaign-history-modal">
           <div class="campaign-history-modal-content">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h4>📊 Campaign History</h4>
+              <h4>ðŸ“Š Campaign History</h4>
               <button class="btn btn-sm btn-light" onclick="this.closest('.campaign-history-modal-overlay').remove()">
                 <i class="ti ti-x"></i>
               </button>
@@ -2557,7 +2574,7 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     }
 
     .user-select-card input[type="checkbox"]:checked ~ .user-select-label::before {
-        content: '✓';
+        content: 'âœ“';
         position: absolute;
         right: 15px;
         top: 50%;
@@ -3265,3 +3282,4 @@ $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
 </body>
 </html>
+

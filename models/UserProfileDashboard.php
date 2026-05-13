@@ -121,52 +121,55 @@ class UserProfileDashboard {
      * Get user activity timeline
      */
     public function getUserActivity($userId, $limit = 30) {
-        $query = "SELECT * FROM user_activity_log 
-                  WHERE user_id = :user_id 
-                  ORDER BY created_at DESC 
-                  LIMIT :limit";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = "SELECT * FROM user_activity_log 
+                      WHERE user_id = :user_id 
+                      ORDER BY created_at DESC 
+                      LIMIT :limit";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     /**
      * Get activity stats for user
      */
     public function getUserActivityStats($userId) {
-        // Total activities
-        $query = "SELECT COUNT(*) as total_activities FROM user_activity_log WHERE user_id = :user_id";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->execute();
-        $total = $stmt->fetch(PDO::FETCH_ASSOC)['total_activities'];
+        try {
+            $query = "SELECT COUNT(*) as total_activities FROM user_activity_log WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+            $total = $stmt->fetch(PDO::FETCH_ASSOC)['total_activities'];
 
-        // Activities last 7 days
-        $query = "SELECT COUNT(*) as recent_activities FROM user_activity_log 
-                  WHERE user_id = :user_id AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->execute();
-        $recent = $stmt->fetch(PDO::FETCH_ASSOC)['recent_activities'];
+            $query = "SELECT COUNT(*) as recent_activities FROM user_activity_log 
+                      WHERE user_id = :user_id AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+            $recent = $stmt->fetch(PDO::FETCH_ASSOC)['recent_activities'];
 
-        // Most common activity
-        $query = "SELECT activity_type, COUNT(*) as count FROM user_activity_log 
-                  WHERE user_id = :user_id 
-                  GROUP BY activity_type 
-                  ORDER BY count DESC 
-                  LIMIT 1";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->execute();
-        $mostCommon = $stmt->fetch(PDO::FETCH_ASSOC);
+            $query = "SELECT activity_type, COUNT(*) as count FROM user_activity_log 
+                      WHERE user_id = :user_id 
+                      GROUP BY activity_type ORDER BY count DESC LIMIT 1";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+            $mostCommon = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return [
-            'total_activities' => $total,
-            'recent_activities' => $recent,
-            'most_common_activity' => $mostCommon ? $mostCommon['activity_type'] : 'None'
-        ];
+            return [
+                'total_activities'   => $total,
+                'recent_activities'  => $recent,
+                'most_common_activity' => $mostCommon ? $mostCommon['activity_type'] : 'None'
+            ];
+        } catch (PDOException $e) {
+            return ['total_activities' => 0, 'recent_activities' => 0, 'most_common_activity' => 'None'];
+        }
     }
 
     // ==================== USER PROFILE DATA ====================
@@ -186,15 +189,19 @@ class UserProfileDashboard {
      * Get user email history
      */
     public function getUserEmailHistory($userId, $limit = 10) {
-        $query = "SELECT * FROM email_campaigns 
-                  WHERE user_id = :user_id 
-                  ORDER BY sent_at DESC 
-                  LIMIT :limit";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $userId);
-        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = "SELECT * FROM email_campaigns 
+                      WHERE user_id = :user_id 
+                      ORDER BY sent_at DESC 
+                      LIMIT :limit";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return []; // table doesn't exist yet
+        }
     }
 
     /**

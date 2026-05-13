@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Check if user is admin
@@ -17,7 +17,7 @@ $objectives = $objectiveController->getAllObjectives();
 if (isset($_GET['delete'])) {
     $deleteId = htmlspecialchars($_GET['delete']);
     if ($objectiveController->delete($deleteId)) {
-        $_SESSION['success_message'] = "Objectif supprimé avec succès!";
+        $_SESSION['success_message'] = "Objectif supprimÃ© avec succÃ¨s!";
         header('Location: objectives.php');
         exit;
     } else {
@@ -38,6 +38,13 @@ if (isset($_GET['delete'])) {
 
   <script type="module" crossorigin src="assets/js/main.js"></script>
   <link rel="stylesheet" crossorigin href="assets/css/main.css">
+  <style>
+    #sidebar { width: 250px !important; }
+    #sidebar .nav-text { display: inline !important; opacity: 1 !important; }
+    #sidebar .logo-area img { display: block !important; }
+    #main { margin-left: 250px !important; }
+    #content { margin-left: 250px !important; }
+  </style>
   <style>
     #sidebar {
       position: fixed;
@@ -184,17 +191,29 @@ if (isset($_GET['delete'])) {
       <li><a class="nav-link" href="index.php#meals-section"><i class="ti ti-tools-kitchen-2"></i><span
             class="nav-text">Repas</span></a></li>
       <li><a class="nav-link" href="index.php#ingredients-section"><i class="ti ti-leaf"></i><span
-            class="nav-text">Ingrédients</span></a></li>
+            class="nav-text">IngrÃ©dients</span></a></li>
       <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
       <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span
-            class="nav-text">Gérer les plans</span></a></li>
+            class="nav-text">GÃ©rer les plans</span></a></li>
       <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span
-            class="nav-text">Créer un plan</span></a></li>
+            class="nav-text">CrÃ©er un plan</span></a></li>
       <li><a class="nav-link active" href="objectives.php"><i class="ti ti-target"></i><span
             class="nav-text">Objectifs</span></a></li>
 
-      <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a>
+      <li class="px-4 py-2"><small class="nav-text">CommunautÃ©</small></li>
+      <li><a class="nav-link" href="post_list.php"><i class="ti ti-article"></i><span
+            class="nav-text">Posts</span></a></li>
+      <li><a class="nav-link" href="comment_list.php"><i class="ti ti-message"></i><span
+            class="nav-text">Commentaires</span></a></li>
+
+            <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
+    <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
+      <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a>
       </li>
     </ul>
   </aside>
@@ -206,7 +225,7 @@ if (isset($_GET['delete'])) {
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 class="h3 mb-0">Gestion des Objectifs</h1>
-          <p class="text-muted">Gérer les objectifs des utilisateurs</p>
+          <p class="text-muted">GÃ©rer les objectifs des utilisateurs</p>
         </div>
       </div>
 
@@ -303,9 +322,9 @@ if (isset($_GET['delete'])) {
                   <th>Poids initial</th>
                   <th>Date limite</th>
                   <th>Statut</th>
-                  <th>Priorité</th>
+                  <th>PrioritÃ©</th>
                   <th>Description</th>
-                  <th>Créé le</th>
+                  <th>CrÃ©Ã© le</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -339,7 +358,7 @@ if (isset($_GET['delete'])) {
                       <td>
                         <div class="btn-group" role="group">
                           <a href="?delete=<?php echo $obj['id_objectif']; ?>" class="btn btn-sm btn-outline-danger"
-                             onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?')">
+                             onclick="return confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cet objectif ?')">
                             <i class="ti ti-trash"></i>
                           </a>
                         </div>
@@ -348,7 +367,7 @@ if (isset($_GET['delete'])) {
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="11" class="text-center">Aucun objectif trouvé.</td>
+                    <td colspan="11" class="text-center">Aucun objectif trouvÃ©.</td>
                   </tr>
                 <?php endif; ?>
               </tbody>
@@ -403,7 +422,7 @@ if (isset($_GET['delete'])) {
       }
     });
 
-    // ── Pagination + Search for objectives ──────────────────────────────
+    // â”€â”€ Pagination + Search for objectives â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const searchInput = document.getElementById('objectivesSearchInput');
     const tableBody   = document.getElementById('objectivesTableBody');
     const pagination  = document.getElementById('objPagination');
@@ -436,9 +455,9 @@ if (isset($_GET['delete'])) {
 
       // Info text
       if (filtered.length === 0) {
-        pageInfo.textContent = 'Aucun résultat trouvé';
+        pageInfo.textContent = 'Aucun rÃ©sultat trouvÃ©';
       } else {
-        pageInfo.textContent = `Affichage ${start + 1}–${Math.min(end, filtered.length)} sur ${filtered.length}`;
+        pageInfo.textContent = `Affichage ${start + 1}â€“${Math.min(end, filtered.length)} sur ${filtered.length}`;
       }
 
       // Build pagination buttons
@@ -492,8 +511,8 @@ if (isset($_GET['delete'])) {
         'inactive':'#ef4444','inactif':'#ef4444',
         'pending':'#f59e0b','en_attente':'#f59e0b','en attente':'#f59e0b',
         'en_cours':'#6366f1','en cours':'#6366f1',
-        'termine':'#10b981','terminé':'#10b981',
-        'annule':'#ef4444','annulé':'#ef4444',
+        'termine':'#10b981','terminÃ©':'#10b981',
+        'annule':'#ef4444','annulÃ©':'#ef4444',
         'cancelled':'#ef4444'
       };
       const backgroundColors = Object.keys(statusCounts).map(s => palette[s] || '#94a3b8');

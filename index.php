@@ -32,6 +32,16 @@ switch ($controller) {
         require_once 'controllers/CommentController.php';
         $ctrl = new CommentController();
         break;
+    case 'boutique':
+        require 'views/front/boutique.php';
+        exit;
+    case 'panier':
+        require 'views/front/panier.php';
+        exit;
+    case 'produit':
+        require_once 'controllers/ProduitController.php';
+        $ctrl = new ProduitController();
+        break;
     default:
         die("Contrôleur introuvable.");
 }

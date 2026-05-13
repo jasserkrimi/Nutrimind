@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Admin check
@@ -17,7 +17,7 @@ if (isset($_GET['delete_meal'])) {
     $deleteId    = htmlspecialchars($_GET['delete_meal']);
     $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
     if ($mealController->delete($deleteId)) {
-        $_SESSION['success_message'] = "Repas supprimé avec succès!";
+        $_SESSION['success_message'] = "Repas supprimÃ© avec succÃ¨s!";
     } else {
         $_SESSION['error_message'] = "Erreur lors de la suppression du repas!";
     }
@@ -38,7 +38,7 @@ $currentPage = $paginationData['currentPage'];
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Repas — NutriMind Admin</title>
+  <title>Repas â€” NutriMind Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logooo.png">
   <script type="module" crossorigin src="assets/js/main.js"></script>
@@ -75,7 +75,7 @@ $currentPage = $paginationData['currentPage'];
               <i class="ti ti-user text-success"></i><span>Profil</span>
             </a>
             <a href="#" onclick="logout(); return false;" class="text-decoration-none text-body d-flex align-items-center gap-2 px-2 py-2 rounded">
-              <i class="ti ti-logout text-danger"></i><span>Déconnexion</span>
+              <i class="ti ti-logout text-danger"></i><span>DÃ©connexion</span>
             </a>
           </div>
         </div>
@@ -95,13 +95,19 @@ $currentPage = $paginationData['currentPage'];
     <li><a class="nav-link" href="users.php"><i class="ti ti-users"></i><span class="nav-text">Utilisateurs</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Nutrition</small></li>
     <li><a class="nav-link active" href="meals.php"><i class="ti ti-tools-kitchen-2"></i><span class="nav-text">Repas</span></a></li>
-    <li><a class="nav-link" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">Ingrédients</span></a></li>
+    <li><a class="nav-link" href="ingredients.php"><i class="ti ti-leaf"></i><span class="nav-text">IngrÃ©dients</span></a></li>
     <li class="px-4 py-2"><small class="nav-text">Planning</small></li>
-    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">Gérer les plans</span></a></li>
-    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">Créer un plan</span></a></li>
+    <li><a class="nav-link" href="planning_list.php"><i class="ti ti-calendar-event"></i><span class="nav-text">GÃ©rer les plans</span></a></li>
+    <li><a class="nav-link" href="planning_create.php"><i class="ti ti-plus"></i><span class="nav-text">CrÃ©er un plan</span></a></li>
     <li><a class="nav-link" href="objectives.php"><i class="ti ti-target"></i><span class="nav-text">Objectifs</span></a></li>
+          <li class="px-4 py-2"><small class="nav-text">Sport</small></li>
+      <li><a class="nav-link" href="../../index.php?c=activite"><i class="ti ti-activity"></i><span class="nav-text">Activités Sportives</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=exercice"><i class="ti ti-stretching"></i><span class="nav-text">Exercices</span></a></li>
+      <li><a class="nav-link" href="../../index.php?c=seance"><i class="ti ti-calendar"></i><span class="nav-text">Emploi du Temps</span></a></li>
+      <li class="px-4 py-2"><small class="nav-text">Boutique</small></li>
+      <li><a class="nav-link" href="../../index.php?c=produit"><i class="ti ti-shopping-cart"></i><span class="nav-text">Produits Sport</span></a></li>
     <li class="px-4 pt-4 pb-2"><small class="nav-text">Compte</small></li>
-    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">Déconnexion</span></a></li>
+    <li><a class="nav-link" href="#" onclick="logout(); return false;"><i class="ti ti-logout"></i><span class="nav-text">DÃ©connexion</span></a></li>
   </ul>
 </aside>
 
@@ -113,7 +119,7 @@ $currentPage = $paginationData['currentPage'];
     <div class="row mb-4">
       <div class="col-12">
         <h1 class="fs-3 mb-1"><i class="ti ti-tools-kitchen-2 me-2 text-success"></i>Gestion des Repas</h1>
-        <p class="text-muted mb-0"><?php echo $totalItems; ?> repas enregistrés</p>
+        <p class="text-muted mb-0"><?php echo $totalItems; ?> repas enregistrÃ©s</p>
       </div>
     </div>
 
@@ -145,7 +151,7 @@ $currentPage = $paginationData['currentPage'];
                 <select id="mealsSortSelect" class="form-select">
                   <option value="name-asc">Trier par: Nom (A-Z)</option>
                   <option value="name-desc">Trier par: Nom (Z-A)</option>
-                  <option value="date-newest">Trier par: Date (Plus récent)</option>
+                  <option value="date-newest">Trier par: Date (Plus rÃ©cent)</option>
                   <option value="date-oldest">Trier par: Date (Plus ancien)</option>
                 </select>
               </div>
@@ -164,7 +170,7 @@ $currentPage = $paginationData['currentPage'];
                 </thead>
                 <tbody id="mealsTableBody">
                   <?php if (empty($meals)): ?>
-                    <tr><td colspan="4" class="text-center py-4"><em>Aucun repas trouvé</em></td></tr>
+                    <tr><td colspan="4" class="text-center py-4"><em>Aucun repas trouvÃ©</em></td></tr>
                   <?php else: ?>
                     <?php foreach ($meals as $meal): ?>
                       <tr>
@@ -191,7 +197,7 @@ $currentPage = $paginationData['currentPage'];
               <?php
                 $from = ($currentPage - 1) * $perPage + 1;
                 $to   = min($currentPage * $perPage, $totalItems);
-                echo "Affichage de $from à $to sur $totalItems repas";
+                echo "Affichage de $from Ã  $to sur $totalItems repas";
               ?>
             </small>
             <nav>
@@ -216,7 +222,7 @@ $currentPage = $paginationData['currentPage'];
     </div>
 
     <footer class="text-center py-4 mt-4 text-secondary">
-      <p class="mb-0">Copyright © 2026 NutriMind Admin</p>
+      <p class="mb-0">Copyright Â© 2026 NutriMind Admin</p>
     </footer>
 
   </div>
@@ -227,7 +233,7 @@ $currentPage = $paginationData['currentPage'];
   document.querySelectorAll('.delete-meal').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+      if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce repas ?')) {
         window.location.href = 'meals.php?delete_meal=' + this.getAttribute('data-id');
       }
     });
@@ -263,7 +269,7 @@ $currentPage = $paginationData['currentPage'];
     if (sort === 'date-newest')   filtered.sort(function (a,b) { return new Date(b.date) - new Date(a.date); });
     if (sort === 'date-oldest')   filtered.sort(function (a,b) { return new Date(a.date) - new Date(b.date); });
     if (filtered.length === 0) {
-      mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><em>Aucun repas trouvé</em></td></tr>';
+      mealsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><em>Aucun repas trouvÃ©</em></td></tr>';
     } else {
       mealsTableBody.innerHTML = filtered.map(function (m) {
         return '<tr><td>' + m.name + '</td><td>' + m.date + '</td><td>' + m.notes + '</td><td>' + m.actions + '</td></tr>';
@@ -271,7 +277,7 @@ $currentPage = $paginationData['currentPage'];
       document.querySelectorAll('.delete-meal').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
-          if (confirm('Êtes-vous sûr de vouloir supprimer ce repas ?')) {
+          if (confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce repas ?')) {
             window.location.href = 'meals.php?delete_meal=' + this.getAttribute('data-id');
           }
         });
@@ -284,7 +290,7 @@ $currentPage = $paginationData['currentPage'];
   initMeals();
 
   function logout() {
-    if (confirm('Voulez-vous vous déconnecter ?')) {
+    if (confirm('Voulez-vous vous dÃ©connecter ?')) {
       window.location.href = '../auth.php?logout=1';
     }
   }
@@ -292,3 +298,4 @@ $currentPage = $paginationData['currentPage'];
 
 </body>
 </html>
+
