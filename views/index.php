@@ -66,7 +66,7 @@
 										<li><a href="index_2.html">Slider Home</a></li>
 									</ul>
 								</li>
-								<li><a href="about.html">About</a></li>
+								<li><a href="index.php">Posts</a></li>
 								<li><a href="#">Pages</a>
 									<ul class="sub-menu">
 										<li><a href="404.html">404 page</a></li>
@@ -358,7 +358,7 @@
 					<h2>Nous sommes <span class="orange-text">NutriMind</span></h2>
 					<p>Etiam vulputate ut augue vel sodales. In sollicitudin neque et massa porttitor vestibulum ac vel nisi. Vestibulum placerat eget dolor sit amet posuere. In ut dolor aliquet, aliquet sapien sed, interdum velit. Nam eu molestie lorem.</p>
 					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente facilis illo repellat veritatis minus, et labore minima mollitia qui ducimus.</p>
-					<a href="about.html" class="boxed-btn mt-4">en savoir plus</a>
+					<a href="post_list.php" class="boxed-btn mt-4">Voir les Posts</a>
 					</div>
 				</div>
 			</div>
